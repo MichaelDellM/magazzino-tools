@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Codifica Articoli</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      color: #333;
+    }
+    .articolo {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 10px 0;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Richiesta Codifica Articoli</h1>
+
+<form action="mailto:mdellorto@lindt.com" method="post" enctype="text/plain">
+
+  <div id="contenitore">
+    <div class="articolo">
+      <h3>Articolo</h3>
+
+      Tipo articolo (M, E, A, I):
+      <input type="text" name="Tipo Articolo">
+
+      Nome / Descrizione:
+      <input type="text" name="Descrizione">
+
+      Linea:
+      <input type="text" name="Linea">
+
+      Fornitore:
+      <input type="text" name="Fornitore">
+
+      Costruttore:
+      <input type="text" name="Costruttore">
+
+      Ubicazione:
+      <input type="text" name="Ubicazione">
+
+      Abastecimiento Minimo:
+      <input type="text" name="Minimo">
+
+      Abastecimiento Massimo:
+      <input type="text" name="Massimo">
+    </div>
+  </div>
+
+  <button type="button" onclick="aggiungiArticolo()">Aggiungi un altro articolo</button>
+  <br><br>
+  <button type="submit">Invia richiesta</button>
+
+</form>
+
+<script>
+function aggiungiArticolo() {
+  const contenitore = document.getElementById("contenitore");
+  const nuovo = contenitore.children[0].cloneNode(true);
+  contenitore.appendChild(nuovo);
+}
+</script>
+
+</body>
+</html>
