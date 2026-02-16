@@ -1,91 +1,274 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Codifica Articoli</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Codifica Articoli - Modulo</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      background-color: #f4f4f4;
+    :root { color-scheme: dark; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:#0b0f14; color:#e7eef7; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 20px; }
+    h1 { margin: 0 0 6px; font-size: 26px; }
+    p  { margin: 0 0 16px; color:#b9c7d8; }
+    .card { background:#121826; border:1px solid #1f2a3a; border-radius: 14px; padding: 16px; margin: 14px 0; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    @media (max-width: 820px){ .row { grid-template-columns: 1fr; } }
+    label { display:block; font-size: 12px; color:#a9bdd6; margin: 8px 0 6px; }
+    input, select, textarea {
+      width:100%; box-sizing:border-box;
+      background:#0e1420; color:#e7eef7;
+      border:1px solid #223047; border-radius: 10px;
+      padding: 10px 11px; outline:none;
     }
-    h1 {
-      color: #333;
+    textarea { min-height: 70px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color:#3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.25); }
+    .btnbar { display:flex; flex-wrap:wrap; gap:10px; margin-top: 14px; }
+    button, a.btn {
+      border:1px solid #2a3a54; background:#172235; color:#e7eef7;
+      padding: 10px 12px; border-radius: 12px;
+      cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
     }
-    .articolo {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    button.primary, a.btn.primary { background:#1d4ed8; border-color:#1d4ed8; }
+    button.danger { background:#3a1a1a; border-color:#5a2222; }
+    button:hover, a.btn:hover { filter: brightness(1.08); }
+    .muted { color:#9fb3c8; font-size: 12px; }
+    .hr { height:1px; background:#1f2a3a; margin: 14px 0; }
+    .titleline { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+    .pill { font-size: 12px; padding: 6px 10px; border-radius: 999px; border:1px solid #2a3a54; background:#0e1420; color:#b9c7d8; }
+    pre {
+      white-space: pre-wrap; word-break: break-word;
+      background:#0e1420; border:1px solid #223047; border-radius: 12px;
+      padding: 12px; margin: 0;
     }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin: 5px 0 10px 0;
-    }
-    button {
-      padding: 10px 15px;
-      background-color: #0078d4;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #005fa3;
-    }
+    .ok { color:#7ee787; }
   </style>
 </head>
+
 <body>
+  <div class="wrap">
+    <div class="card">
+      <div class="titleline">
+        <div>
+          <h1>Codifica Articoli — Modulo</h1>
+          <p>Compila i dati (nessun campo è obbligatorio). Puoi aggiungere più articoli. Alla fine copi il testo o lo invii via email.</p>
+        </div>
+        <div class="pill">Lingua: Italiano</div>
+      </div>
 
-<h1>Richiesta Codifica Articoli</h1>
+      <label>Email destinatario (tuo indirizzo)</label>
+      <input id="destEmail" type="email" value="mdellorto@lindt.com" />
 
-<form action="mailto:mdellorto@lindt.com" method="post" enctype="text/plain">
+      <div class="hr"></div>
 
-  <div id="contenitore">
-    <div class="articolo">
-      <h3>Articolo</h3>
+      <div id="items"></div>
 
-      Tipo articolo (M, E, A, I):
-      <input type="text" name="Tipo Articolo">
+      <div class="btnbar">
+        <button id="addBtn" class="primary" type="button">➕ Aggiungi articolo</button>
+        <button id="buildBtn" type="button">🧾 Genera riepilogo</button>
+        <button id="copyBtn" type="button">📋 Copia riepilogo</button>
+        <a id="mailBtn" class="btn primary" href="#" role="button">✉️ Invia via email</a>
+        <button id="clearBtn" class="danger" type="button">🗑️ Reset</button>
+      </div>
 
-      Nome / Descrizione:
-      <input type="text" name="Descrizione">
+      <p class="muted">
+        Nota: “Invia via email” usa l’app di posta predefinita del dispositivo (mailto). Se non si apre, copia il riepilogo e incollalo manualmente in Outlook.
+      </p>
+    </div>
 
-      Linea:
-      <input type="text" name="Linea">
-
-      Fornitore:
-      <input type="text" name="Fornitore">
-
-      Costruttore:
-      <input type="text" name="Costruttore">
-
-      Ubicazione:
-      <input type="text" name="Ubicazione">
-
-      Abastecimiento Minimo:
-      <input type="text" name="Minimo">
-
-      Abastecimiento Massimo:
-      <input type="text" name="Massimo">
+    <div class="card">
+      <div class="titleline">
+        <h2 style="margin:0; font-size:18px;">Riepilogo</h2>
+        <div id="status" class="muted"></div>
+      </div>
+      <div class="hr"></div>
+      <pre id="output">Premi “Genera riepilogo”.</pre>
     </div>
   </div>
 
-  <button type="button" onclick="aggiungiArticolo()">Aggiungi un altro articolo</button>
-  <br><br>
-  <button type="submit">Invia richiesta</button>
-
-</form>
-
 <script>
-function aggiungiArticolo() {
-  const contenitore = document.getElementById("contenitore");
-  const nuovo = contenitore.children[0].cloneNode(true);
-  contenitore.appendChild(nuovo);
-}
-</script>
+  const $ = (id) => document.getElementById(id);
 
+  const templateItem = (n) => `
+    <div class="card" data-item>
+      <div class="titleline">
+        <strong>Articolo ${n}</strong>
+        <button type="button" class="danger" onclick="removeItem(this)">Rimuovi</button>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Tipo articolo (M / E / A / I)</label>
+          <select data-field="tipo">
+            <option value="">(vuoto)</option>
+            <option value="M">M</option>
+            <option value="E">E</option>
+            <option value="A">A</option>
+            <option value="I">I</option>
+          </select>
+        </div>
+        <div>
+          <label>Fornitore</label>
+          <input data-field="fornitore" type="text" placeholder="Es. Rubix" />
+        </div>
+      </div>
+
+      <label>Nome / Descrizione</label>
+      <input data-field="descrizione" type="text" placeholder="Descrizione articolo" />
+
+      <div class="row">
+        <div>
+          <label>Linea (macchina)</label>
+          <input data-field="linea" type="text" placeholder="Es. Linea 2 - Raffinatrice 4" />
+        </div>
+        <div>
+          <label>Costruttore</label>
+          <input data-field="costruttore" type="text" placeholder="Es. Festo, Siemens, ..." />
+        </div>
+      </div>
+
+      <label>Ubicazione</label>
+      <input data-field="ubicazione" type="text" placeholder="Es. Mansarda / Osòla / Magazzino ..." />
+
+      <div class="row">
+        <div>
+          <label>Abastecimiento (Min)</label>
+          <input data-field="min" type="text" inputmode="numeric" placeholder="Minimo" />
+        </div>
+        <div>
+          <label>Abastecimiento (Max)</label>
+          <input data-field="max" type="text" inputmode="numeric" placeholder="Massimo" />
+        </div>
+      </div>
+
+      <label>Note (opzionale)</label>
+      <textarea data-field="note" placeholder="Eventuali note..."></textarea>
+    </div>
+  `;
+
+  function renumberItems(){
+    const cards = document.querySelectorAll('[data-item]');
+    cards.forEach((card, idx) => {
+      const title = card.querySelector('strong');
+      if (title) title.textContent = `Articolo ${idx + 1}`;
+    });
+  }
+
+  window.removeItem = (btn) => {
+    const card = btn.closest('[data-item]');
+    if (card) card.remove();
+    renumberItems();
+    setStatus('Articolo rimosso.');
+  };
+
+  function addItem(){
+    const container = $('items');
+    const n = container.querySelectorAll('[data-item]').length + 1;
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = templateItem(n);
+    container.appendChild(wrapper.firstElementChild);
+    setStatus('Articolo aggiunto.');
+  }
+
+  function getItemsData(){
+    const cards = document.querySelectorAll('[data-item]');
+    return Array.from(cards).map((card, idx) => {
+      const get = (name) => (card.querySelector(`[data-field="${name}"]`)?.value || '').trim();
+      return {
+        idx: idx + 1,
+        tipo: get('tipo'),
+        descrizione: get('descrizione'),
+        linea: get('linea'),
+        fornitore: get('fornitore'),
+        costruttore: get('costruttore'),
+        ubicazione: get('ubicazione'),
+        min: get('min'),
+        max: get('max'),
+        note: get('note'),
+      };
+    });
+  }
+
+  function buildSummary(){
+    const email = $('destEmail').value.trim();
+    const items = getItemsData();
+
+    const lines = [];
+    lines.push('Richiesta codifica articoli');
+    lines.push('--------------------------------');
+    lines.push(`Numero articoli: ${items.length}`);
+    lines.push('');
+
+    items.forEach(it => {
+      lines.push(`ARTICOLO ${it.idx}`);
+      if (it.tipo)        lines.push(`- Tipo articolo: ${it.tipo}`);
+      if (it.descrizione) lines.push(`- Nome/Descrizione: ${it.descrizione}`);
+      if (it.linea)       lines.push(`- Linea: ${it.linea}`);
+      if (it.fornitore)   lines.push(`- Fornitore: ${it.fornitore}`);
+      if (it.costruttore) lines.push(`- Costruttore: ${it.costruttore}`);
+      if (it.ubicazione)  lines.push(`- Ubicazione: ${it.ubicazione}`);
+      if (it.min || it.max){
+        const min = it.min || '(vuoto)';
+        const max = it.max || '(vuoto)';
+        lines.push(`- Abastecimiento (Min/Max): ${min} / ${max}`);
+      }
+      if (it.note)        lines.push(`- Note: ${it.note}`);
+      lines.push('');
+    });
+
+    lines.push('Grazie.');
+    const text = lines.join('\n');
+
+    $('output').textContent = text;
+
+    // mailto link (subject + body)
+    const subject = encodeURIComponent('Richiesta codifica articoli');
+    const body = encodeURIComponent(text);
+    $('mailBtn').href = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+
+    setStatus('Riepilogo generato. ✅', true);
+    return text;
+  }
+
+  async function copySummary(){
+    const text = buildSummary();
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus('Copiato negli appunti. ✅', true);
+    } catch (e){
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setStatus('Copiato (fallback). ✅', true);
+    }
+  }
+
+  function resetAll(){
+    $('items').innerHTML = '';
+    addItem();
+    $('output').textContent = 'Premi “Genera riepilogo”.';
+    setStatus('Resettato.');
+  }
+
+  function setStatus(msg, ok=false){
+    const el = $('status');
+    el.textContent = msg;
+    el.className = ok ? 'muted ok' : 'muted';
+    clearTimeout(window.__st);
+    window.__st = setTimeout(()=>{ el.textContent=''; }, 3500);
+  }
+
+  // init
+  $('addBtn').addEventListener('click', addItem);
+  $('buildBtn').addEventListener('click', buildSummary);
+  $('copyBtn').addEventListener('click', copySummary);
+  $('clearBtn').addEventListener('click', resetAll);
+
+  // start with 1 item
+  addItem();
+</script>
 </body>
 </html>
