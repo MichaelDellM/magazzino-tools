@@ -54,9 +54,7 @@
         </div>
         <div class="pill">Lingua: Italiano</div>
       </div>
-
-      <label>Email destinatario (tuo indirizzo)</label>
-      <input id="destEmail" type="email" value="mdellorto@lindt.com" />
+      
 
       <div class="field">
       <label for="richiedente">Richiedente (Nome e Cognome)</label>
@@ -137,11 +135,11 @@
 
       <div class="row">
         <div>
-          <label>Scorta (Min)</label>
+          <label>Approvvigionamento (Min)</label>
           <input data-field="min" type="text" inputmode="numeric" placeholder="Minimo" />
         </div>
         <div>
-          <label>Scorta (Max)</label>
+          <label>Approvvigionamento (Max)</label>
           <input data-field="max" type="text" inputmode="numeric" placeholder="Massimo" />
         </div>
       </div>
@@ -195,12 +193,14 @@
   }
 
   function buildSummary(){
-    const email = $('destEmail').value.trim();
+    const email = "mdellorto@lindt.com";
+    const richiedente = $('richiedente')?.value.trim() || '';
     const items = getItemsData();
 
     const lines = [];
     lines.push('Richiesta codifica articoli');
     lines.push('--------------------------------');
+    if (richiedente) lines.push(`Richiedente: ${richiedente}`);
     lines.push(`Numero articoli: ${items.length}`);
     lines.push('');
 
@@ -215,7 +215,7 @@
       if (it.min || it.max){
         const min = it.min || '(vuoto)';
         const max = it.max || '(vuoto)';
-        lines.push(`- Scorta (Min / Max): ${min} / ${max}`);
+        lines.push(`- Approvvigionamento (Min / Max): ${min} / ${max}`);
       }
       if (it.note)        lines.push(`- Note: ${it.note}`);
       lines.push('');
@@ -229,7 +229,7 @@
     // mailto link (subject + body)
     const subject = encodeURIComponent('Richiesta codifica articoli');
     const body = encodeURIComponent(text);
-    $('mailBtn').href = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+    $('mailBtn').href = `mailto:mdellorto@lindt.com?subject=${subject}&body=${body}`;
 
     setStatus('Riepilogo generato. ✅', true);
     return text;
