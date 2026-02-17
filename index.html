@@ -63,6 +63,44 @@
 
       
       <div class="hr"></div>
+<!-- ===== MODULO: RICHIESTA ACQUISTO ===== -->
+<div id="modAcquisto" style="display:none;">
+  <div class="card">
+    <h2 style="margin:0 0 10px; font-size:18px;">Richiesta acquisto — Modulo</h2>
+
+    <label>Richiedente (Nome e Cognome)</label>
+    <input id="acq_richiedente" type="text" placeholder="Es. Mario Rossi" />
+
+    <label>Note generali (opzionale)</label>
+    <textarea id="acq_note_generali" placeholder="Indicazioni generali..."></textarea>
+
+    <div class="hr"></div>
+
+    <div id="acq_items"></div>
+
+    <div class="btnbar">
+      <button id="acq_addBtn" class="primary" type="button">➕ Aggiungi un altro articolo</button>
+      <button id="acq_buildBtn" type="button">✅ Passo 1 — Genera riepilogo</button>
+      <button id="acq_copyBtn" type="button">📋 Passo 2 — Copia il testo</button>
+      <a id="acq_mailBtn" class="btn primary" href="#" role="button">✉️ Passo 3 — Finalizza e invia</a>
+      <button id="acq_clearBtn" class="danger" type="button">🔄 Ripristina modulo</button>
+    </div>
+
+    <p class="muted">
+      Destinatari: Fabio (TO) + Michael (CC). L’invio usa l’app di posta predefinita (mailto).
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="titleline">
+      <h2 style="margin:0; font-size:18px;">Riepilogo (Acquisto)</h2>
+      <div id="acq_status" class="muted"></div>
+    </div>
+    <div class="hr"></div>
+    <pre id="acq_output">Premi “Genera riepilogo”.</pre>
+  </div>
+</div>
+<!-- ===== /MODULO: RICHIESTA ACQUISTO ===== -->
 
       <div id="items"></div>
 
@@ -164,6 +202,271 @@
       <textarea data-field="note" placeholder="Eventuali note..."></textarea>
     </div>
   `;
+// === EMAILS FISSI (Acquisto) ===
+const EMAIL_MICHAEL = "mdellorto@lindt.com";
+const EMAIL_FABIO   = "fcastagna@lindt.com";
+
+// ===== TEMPLATE ARTICOLO ACQUISTO =====
+const templateAcqItem = (n) => `
+  <div class="card" data-acq-item>
+    <div class="titleline">
+      <strong>Articolo ${n}</strong>
+      <button type="button" class="danger" onclick="removeAcqItem(this)">Rimuovi</button>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Articolo già codificato?</label>
+        <select data-acq="codificato" onchange="toggleAcqCodificato(this)">
+          <option value="SI">Sì</option>
+          <option value="NO">No</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Urgenza</label>
+        <select data-acq="urgenza">
+          <option value="Normale">Normale</option>
+          <option value="Alta">Alta</option>
+          <option value="Macchina critica, rischio fermo">Macchina critica, rischio fermo</option>
+        </select>
+      </div>
+    </div>
+
+    <div data-acq-section="si">
+      <div class="row">
+        <div>
+          <label>Codice CARL (interno)</label>
+          <input data-acq="carl" type="text" placeholder="Es. M12345 / A000..." />
+        </div>
+        <div>
+          <label>Descrizione breve</label>
+          <input data-acq="descr_breve" type="text" placeholder="Descrizione breve" />
+        </div>
+      </div>
+    </div>
+
+    <div data-acq-section="no" style="display:none;">
+      <label>Descrizione completa (come codifica)</label>
+      <textarea data-acq="descr_completa" placeholder="Descrizione completa..."></textarea>
+    </div>
+
+    <label>Quantità</label>
+    <input data-acq="qty" type="text" inputmode="numeric" placeholder="Es. 2" />
+
+    <div class="row">
+      <div>
+        <label>Unità</label>
+        <select data-acq="unita" onchange="toggleAcqSet(this)">
+          <option value="pz">pz</option>
+          <option value="mt">mt</option>
+          <option value="kg">kg</option>
+          <option value="set">set</option>
+        </select>
+      </div>
+      <div data-acq-set style="display:none;">
+        <label>Pezzi per set</label>
+        <input data-acq="pezzi_set" type="text" inputmode="numeric" placeholder="Es. 4" />
+      </div>
+    </div>
+
+    <label>Fornitore (se conosciuto) / a scelta</label>
+    <input data-acq="fornitore" type="text" placeholder="Es. Rubix / a scelta" />
+
+    <div class="row">
+      <div>
+        <label>Costruttore / Marca (opzionale)</label>
+        <input data-acq="marca" type="text" placeholder="Es. Siemens, Festo..." />
+      </div>
+      <div>
+        <label>Macchina / Linea d’uso</label>
+        <input data-acq="macchina_linea" type="text" placeholder="Es. Raffinatrice 4 / Linea 2" />
+      </div>
+    </div>
+
+    <label>Riferimento (cod. fornitore / modello / link / “foto allegata”)</label>
+    <input data-acq="riferimento" type="text" placeholder="Es. DSBC-40-80... / link / foto allegata" />
+
+    <label>Motivo</label>
+    <select data-acq="motivo">
+      <option value="Scorta">Scorta</option>
+      <option value="Rottura">Rottura</option>
+      <option value="Miglioramento">Miglioramento</option>
+      <option value="Progetto">Progetto</option>
+      <option value="Prova">Prova</option>
+    </select>
+
+    <label>Note (opzionale)</label>
+    <textarea data-acq="note" placeholder="Note sull’articolo..."></textarea>
+  </div>
+`;
+
+function acqSetStatus(msg, ok=false){
+  const el = document.getElementById('acq_status');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = ok ? 'muted ok' : 'muted';
+  clearTimeout(window.__acqst);
+  window.__acqst = setTimeout(()=>{ el.textContent=''; }, 3500);
+}
+
+function acqRenumber(){
+  const cards = document.querySelectorAll('[data-acq-item]');
+  cards.forEach((card, idx) => {
+    const title = card.querySelector('strong');
+    if (title) title.textContent = `Articolo ${idx + 1}`;
+  });
+}
+
+window.removeAcqItem = (btn) => {
+  const card = btn.closest('[data-acq-item]');
+  if (card) card.remove();
+  acqRenumber();
+  acqSetStatus('Articolo rimosso.');
+};
+
+window.toggleAcqCodificato = (selectEl) => {
+  const card = selectEl.closest('[data-acq-item]');
+  const yes = card.querySelector('[data-acq-section="si"]');
+  const no  = card.querySelector('[data-acq-section="no"]');
+  if (selectEl.value === 'SI'){
+    yes.style.display = '';
+    no.style.display  = 'none';
+  } else {
+    yes.style.display = 'none';
+    no.style.display  = '';
+  }
+};
+
+window.toggleAcqSet = (selectEl) => {
+  const card = selectEl.closest('[data-acq-item]');
+  const box = card.querySelector('[data-acq-set]');
+  box.style.display = (selectEl.value === 'set') ? '' : 'none';
+};
+
+function acqAddItem(){
+  const container = document.getElementById('acq_items');
+  const n = container.querySelectorAll('[data-acq-item]').length + 1;
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = templateAcqItem(n);
+  container.appendChild(wrapper.firstElementChild);
+
+  // init toggle states
+  const last = container.querySelectorAll('[data-acq-item]')[n-1];
+  toggleAcqCodificato(last.querySelector('[data-acq="codificato"]'));
+  toggleAcqSet(last.querySelector('[data-acq="unita"]'));
+
+  acqSetStatus('Articolo aggiunto.');
+}
+
+function acqGetItems(){
+  const cards = document.querySelectorAll('[data-acq-item]');
+  return Array.from(cards).map((card, idx) => {
+    const get = (name) => (card.querySelector(`[data-acq="${name}"]`)?.value || '').trim();
+    return {
+      idx: idx + 1,
+      codificato: get('codificato'),
+      carl: get('carl'),
+      descr_breve: get('descr_breve'),
+      descr_completa: get('descr_completa'),
+      qty: get('qty'),
+      unita: get('unita'),
+      pezzi_set: get('pezzi_set'),
+      fornitore: get('fornitore'),
+      marca: get('marca'),
+      macchina_linea: get('macchina_linea'),
+      riferimento: get('riferimento'),
+      motivo: get('motivo'),
+      urgenza: get('urgenza'),
+      note: get('note'),
+    };
+  });
+}
+
+function acqBuildSummary(){
+  const rich = (document.getElementById('acq_richiedente')?.value || '').trim();
+  const noteGen = (document.getElementById('acq_note_generali')?.value || '').trim();
+  const items = acqGetItems();
+
+  const lines = [];
+  lines.push('RICHIESTA ACQUISTO');
+  lines.push('--------------------------------');
+  lines.push(`Richiedente: ${rich || '(non indicato)'}`);
+  lines.push(`Numero articoli: ${items.length}`);
+  if (noteGen) lines.push(`Note generali: ${noteGen}`);
+  lines.push('');
+
+  items.forEach(it => {
+    lines.push(`ARTICOLO ${it.idx}`);
+    lines.push(`- Urgenza: ${it.urgenza || '(non indicato)'}`);
+    lines.push(`- Articolo già codificato: ${it.codificato || '(non indicato)'}`);
+
+    if (it.codificato === 'SI'){
+      if (it.carl) lines.push(`- Codice CARL: ${it.carl}`);
+      if (it.descr_breve) lines.push(`- Descrizione breve: ${it.descr_breve}`);
+    } else {
+      if (it.descr_completa) lines.push(`- Descrizione completa: ${it.descr_completa}`);
+    }
+
+    if (it.qty) lines.push(`- Quantità: ${it.qty}`);
+
+    if (it.unita){
+      let un = it.unita;
+      if (un === 'set' && it.pezzi_set) un += ` (pezzi per set: ${it.pezzi_set})`;
+      lines.push(`- Unità: ${un}`);
+    }
+
+    if (it.fornitore) lines.push(`- Fornitore: ${it.fornitore}`);
+    if (it.marca) lines.push(`- Costruttore/Marca: ${it.marca}`);
+    if (it.macchina_linea) lines.push(`- Macchina/Linea d’uso: ${it.macchina_linea}`);
+    if (it.riferimento) lines.push(`- Riferimento: ${it.riferimento}`);
+    if (it.motivo) lines.push(`- Motivo: ${it.motivo}`);
+    if (it.note) lines.push(`- Note: ${it.note}`);
+    lines.push('');
+  });
+
+  lines.push('Grazie.');
+  const text = lines.join('\n');
+
+  document.getElementById('acq_output').textContent = text;
+
+  const subject = encodeURIComponent('Richiesta acquisto');
+  const body = encodeURIComponent(text);
+
+  const to = encodeURIComponent(EMAIL_FABIO);
+  const cc = encodeURIComponent(EMAIL_MICHAEL);
+
+  document.getElementById('acq_mailBtn').href =
+    `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
+
+  acqSetStatus('Riepilogo generato. ✅', true);
+  return text;
+}
+
+async function acqCopySummary(){
+  const text = acqBuildSummary();
+  try {
+    await navigator.clipboard.writeText(text);
+    acqSetStatus('Copiato negli appunti. ✅', true);
+  } catch (e){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    acqSetStatus('Copiato (fallback). ✅', true);
+  }
+}
+
+function acqReset(){
+  document.getElementById('acq_richiedente').value = '';
+  document.getElementById('acq_note_generali').value = '';
+  document.getElementById('acq_items').innerHTML = '';
+  document.getElementById('acq_output').textContent = 'Premi “Genera riepilogo”.';
+  acqAddItem();
+  acqSetStatus('Ripristinato.');
+}
 
   function renumberItems(){
     const cards = document.querySelectorAll('[data-item]');
@@ -291,6 +594,16 @@
 
   // start with 1 item
   addItem();
+  // ===== INIT MODULO ACQUISTO =====
+document.getElementById('acq_addBtn')?.addEventListener('click', acqAddItem);
+document.getElementById('acq_buildBtn')?.addEventListener('click', acqBuildSummary);
+document.getElementById('acq_copyBtn')?.addEventListener('click', acqCopySummary);
+document.getElementById('acq_clearBtn')?.addEventListener('click', acqReset);
+
+// SOLO PER TEST (poi lo togliamo quando fai la Home con 3 bottoni)
+document.getElementById('modAcquisto').style.display = 'block';
+acqAddItem();
+
 </script>
 </body>
 </html>
