@@ -61,6 +61,11 @@
       <input id="richiedente" name="richiedente" type="text" placeholder="Es. Mario Rossi">
       </div>
 
+<div class="btnbar" style="margin-top:10px;">
+  <button id="btnShowCodifica" class="primary" type="button">🧾 Codifica articoli</button>
+  <button id="btnShowAcquisto" type="button">🛒 Richiesta acquisto</button>
+</div>
+
       
       <div class="hr"></div>
 <!-- ===== MODULO: RICHIESTA ACQUISTO ===== -->
@@ -102,6 +107,8 @@
 </div>
 <!-- ===== /MODULO: RICHIESTA ACQUISTO ===== -->
 
+      <div id="modCodifica">
+
       <div id="items"></div>
 
     <div class="btnbar">
@@ -140,6 +147,8 @@
       </div>
       <div class="hr"></div>
       <pre id="output">Premi “Genera riepilogo”.</pre>
+      </div> <!-- fine modCodifica -->
+
     </div>
   </div>
 
@@ -586,24 +595,46 @@ function acqReset(){
     window.__st = setTimeout(()=>{ el.textContent=''; }, 3500);
   }
 
-  // init
-  $('addBtn').addEventListener('click', addItem);
-  $('buildBtn').addEventListener('click', buildSummary);
-  $('copyBtn').addEventListener('click', copySummary);
-  $('clearBtn').addEventListener('click', resetAll);
+ // init (Codifica)
+$('addBtn').addEventListener('click', addItem);
+$('buildBtn').addEventListener('click', buildSummary);
+$('copyBtn').addEventListener('click', copySummary);
+$('clearBtn').addEventListener('click', resetAll);
 
-  // start with 1 item
-  addItem();
-  // ===== INIT MODULO ACQUISTO =====
+// init (Acquisto)
 document.getElementById('acq_addBtn')?.addEventListener('click', acqAddItem);
 document.getElementById('acq_buildBtn')?.addEventListener('click', acqBuildSummary);
 document.getElementById('acq_copyBtn')?.addEventListener('click', acqCopySummary);
 document.getElementById('acq_clearBtn')?.addEventListener('click', acqReset);
 
-// SOLO PER TEST (poi lo togliamo quando fai la Home con 3 bottoni)
-document.getElementById('modAcquisto').style.display = 'block';
+// Crea 1 articolo per modulo (una sola volta)
+addItem();
 acqAddItem();
 
-</script>
-</body>
-</html>
+// ===== LOGICA MOSTRA/NASCONDI MODULI =====
+function showModule(which){
+  const modCod = document.getElementById('modCodifica');
+  const modAcq = document.getElementById('modAcquisto');
+  const btnCod = document.getElementById('btnShowCodifica');
+  const btnAcq = document.getElementById('btnShowAcquisto');
+
+  if (!modCod || !modAcq) return;
+
+  const isCod = which === 'codifica';
+
+  modCod.style.display = isCod ? 'block' : 'none';
+  modAcq.style.display = isCod ? 'none' : 'block';
+
+  // evidenzia bottone attivo (opzionale ma utile)
+  if (btnCod && btnAcq){
+    btnCod.classList.toggle('primary', isCod);
+    btnAcq.classList.toggle('primary', !isCod);
+  }
+}
+
+// Click dei bottoni
+document.getElementById('btnShowCodifica')?.addEventListener('click', () => showModule('codifica'));
+document.getElementById('btnShowAcquisto')?.addEventListener('click', () => showModule('acquisto'));
+
+// Modulo di default all’apertura:
+showModule('codifica');
