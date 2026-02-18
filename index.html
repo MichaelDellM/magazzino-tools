@@ -595,46 +595,49 @@ function acqReset(){
     window.__st = setTimeout(()=>{ el.textContent=''; }, 3500);
   }
 
- // init (Codifica)
-$('addBtn').addEventListener('click', addItem);
-$('buildBtn').addEventListener('click', buildSummary);
-$('copyBtn').addEventListener('click', copySummary);
-$('clearBtn').addEventListener('click', resetAll);
+// =====================
+// INIT UNICO (AL FINAL)
+// =====================
+(function initApp() {
+  // --- Bind bottoni CODIFICA (safe) ---
+  $('addBtn')?.addEventListener('click', addItem);
+  $('buildBtn')?.addEventListener('click', buildSummary);
+  $('copyBtn')?.addEventListener('click', copySummary);
+  $('clearBtn')?.addEventListener('click', resetAll);
 
-// init (Acquisto)
-document.getElementById('acq_addBtn')?.addEventListener('click', acqAddItem);
-document.getElementById('acq_buildBtn')?.addEventListener('click', acqBuildSummary);
-document.getElementById('acq_copyBtn')?.addEventListener('click', acqCopySummary);
-document.getElementById('acq_clearBtn')?.addEventListener('click', acqReset);
+  // --- Bind bottoni ACQUISTO (safe) ---
+  document.getElementById('acq_addBtn')?.addEventListener('click', acqAddItem);
+  document.getElementById('acq_buildBtn')?.addEventListener('click', acqBuildSummary);
+  document.getElementById('acq_copyBtn')?.addEventListener('click', acqCopySummary);
+  document.getElementById('acq_clearBtn')?.addEventListener('click', acqReset);
 
-// Crea 1 articolo per modulo (una sola volta)
-addItem();
-acqAddItem();
+  // --- Crea 1 articolo per modulo (solo se vuoto) ---
+  if (document.querySelectorAll('[data-item]').length === 0) addItem();
+  if (document.querySelectorAll('[data-acq-item]').length === 0) acqAddItem();
 
-// ===== LOGICA MOSTRA/NASCONDI MODULI =====
-function showModule(which){
-  const modCod = document.getElementById('modCodifica');
-  const modAcq = document.getElementById('modAcquisto');
-  const btnCod = document.getElementById('btnShowCodifica');
-  const btnAcq = document.getElementById('btnShowAcquisto');
+  // --- LOGICA MOSTRA/NASCONDI MODULI ---
+  function showModule(which){
+    const modCod = document.getElementById('modCodifica');
+    const modAcq = document.getElementById('modAcquisto');
+    const btnCod = document.getElementById('btnShowCodifica');
+    const btnAcq = document.getElementById('btnShowAcquisto');
+    if (!modCod || !modAcq) return;
 
-  if (!modCod || !modAcq) return;
+    const isCod = which === 'codifica';
+    modCod.style.display = isCod ? 'block' : 'none';
+    modAcq.style.display = isCod ? 'none' : 'block';
 
-  const isCod = which === 'codifica';
-
-  modCod.style.display = isCod ? 'block' : 'none';
-  modAcq.style.display = isCod ? 'none' : 'block';
-
-  // evidenzia bottone attivo (opzionale ma utile)
-  if (btnCod && btnAcq){
-    btnCod.classList.toggle('primary', isCod);
-    btnAcq.classList.toggle('primary', !isCod);
+    if (btnCod && btnAcq){
+      btnCod.classList.toggle('primary', isCod);
+      btnAcq.classList.toggle('primary', !isCod);
+    }
   }
-}
 
-// Click dei bottoni
-document.getElementById('btnShowCodifica')?.addEventListener('click', () => showModule('codifica'));
-document.getElementById('btnShowAcquisto')?.addEventListener('click', () => showModule('acquisto'));
+  document.getElementById('btnShowCodifica')?.addEventListener('click', () => showModule('codifica'));
+  document.getElementById('btnShowAcquisto')?.addEventListener('click', () => showModule('acquisto'));
 
-// Modulo di default all’apertura:
-showModule('codifica');
+  showModule('codifica');
+})();
+</script>
+</body>
+</html>
