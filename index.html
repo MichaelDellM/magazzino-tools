@@ -62,12 +62,29 @@
       </div>
 
 <div class="btnbar" style="margin-top:10px;">
-  <button id="btnShowCodifica" class="primary" type="button">🧾 Codifica articoli</button>
+  <button id="btnShowHome" class="primary" type="button">🏠 Home</button>
+  <button id="btnShowCodifica" type="button">🧾 Codifica articoli</button>
   <button id="btnShowAcquisto" type="button">🛒 Richiesta acquisto</button>
+  <button id="btnShowSpedizione" type="button">📦 Spedizione</button>
 </div>
 
-      
-      <div class="hr"></div>
+<div class="hr"></div>
+
+<!-- ===== HOME (solo 3 bottoni grandi) ===== -->
+<div id="modHome">
+  <div class="card">
+    <h2 style="margin:0 0 10px; font-size:18px;">Seleziona modulo</h2>
+    <p class="muted" style="margin-top:0;">Scegli cosa vuoi fare.</p>
+
+    <div class="btnbar">
+      <button id="homeCodifica" class="primary" type="button">🧾 Codifica articoli</button>
+      <button id="homeAcquisto" type="button">🛒 Richiesta acquisto</button>
+      <button id="homeSpedizione" type="button">📦 Spedizione</button>
+    </div>
+  </div>
+</div>
+<!-- ===== /HOME ===== -->
+
 <!-- ===== MODULO: RICHIESTA ACQUISTO ===== -->
 <div id="modAcquisto" style="display:none;">
   <div class="card">
@@ -102,7 +119,7 @@
     <pre id="acq_output">Premi “Genera riepilogo”.</pre>
   </div>
 </div>
-<!-- ===== /MODULO: RICHIESTA ACQUISTO ===== -->
+<!-- ===== /MODULO: RICHIESTA CODIFICA ===== -->
 
       <div id="modCodifica">
 
@@ -130,6 +147,14 @@
   </button>
 </div>
 
+<!-- ===== /MODULO: RICHIESTA SPEDIZIONE ===== -->
+        
+<div id="modSpedizione" style="display:none;">
+  <div class="card">
+    <h2 style="margin:0 0 10px; font-size:18px;">Spedizione — Modulo</h2>
+    <p class="muted">In arrivo… (lo costruiamo dopo)</p>
+  </div>
+</div>
 
 
       <p class="muted">
@@ -613,27 +638,54 @@ function acqReset(){
   if (document.querySelectorAll('[data-acq-item]').length === 0) acqAddItem();
 
   // --- LOGICA MOSTRA/NASCONDI MODULI ---
-  function showModule(which){
-    const modCod = document.getElementById('modCodifica');
-    const modAcq = document.getElementById('modAcquisto');
-    const btnCod = document.getElementById('btnShowCodifica');
-    const btnAcq = document.getElementById('btnShowAcquisto');
-    if (!modCod || !modAcq) return;
+ function showModule(which){
+  const home = document.getElementById('modHome');
+  const cod  = document.getElementById('modCodifica');
+  const acq  = document.getElementById('modAcquisto');
+  const spd  = document.getElementById('modSpedizione');
 
-    const isCod = which === 'codifica';
-    modCod.style.display = isCod ? 'block' : 'none';
-    modAcq.style.display = isCod ? 'none' : 'block';
+  const btnHome = document.getElementById('btnShowHome');
+  const btnCod  = document.getElementById('btnShowCodifica');
+  const btnAcq  = document.getElementById('btnShowAcquisto');
+  const btnSpd  = document.getElementById('btnShowSpedizione');
 
-    if (btnCod && btnAcq){
-      btnCod.classList.toggle('primary', isCod);
-      btnAcq.classList.toggle('primary', !isCod);
-    }
-  }
+  // seguridad
+  if (!home || !cod || !acq || !spd) return;
 
-  document.getElementById('btnShowCodifica')?.addEventListener('click', () => showModule('codifica'));
-  document.getElementById('btnShowAcquisto')?.addEventListener('click', () => showModule('acquisto'));
+  // oculta todo
+  home.style.display = 'none';
+  cod.style.display  = 'none';
+  acq.style.display  = 'none';
+  spd.style.display  = 'none';
 
-  showModule('codifica');
+  // muestra el seleccionado
+  if (which === 'codifica') cod.style.display = 'block';
+  else if (which === 'acquisto') acq.style.display = 'block';
+  else if (which === 'spedizione') spd.style.display = 'block';
+  else home.style.display = 'block'; // default HOME
+
+  // resalta botón activo
+  const map = { home: btnHome, codifica: btnCod, acquisto: btnAcq, spedizione: btnSpd };
+  [btnHome, btnCod, btnAcq, btnSpd].forEach(b => b && b.classList.remove('primary'));
+  if (map[which]) map[which].classList.add('primary');
+  else btnHome?.classList.add('primary');
+}
+
+
+  // Barra superior (siempre visible)
+document.getElementById('btnShowHome')?.addEventListener('click', () => showModule('home'));
+document.getElementById('btnShowCodifica')?.addEventListener('click', () => showModule('codifica'));
+document.getElementById('btnShowAcquisto')?.addEventListener('click', () => showModule('acquisto'));
+document.getElementById('btnShowSpedizione')?.addEventListener('click', () => showModule('spedizione'));
+
+// Botones grandes en HOME
+document.getElementById('homeCodifica')?.addEventListener('click', () => showModule('codifica'));
+document.getElementById('homeAcquisto')?.addEventListener('click', () => showModule('acquisto'));
+document.getElementById('homeSpedizione')?.addEventListener('click', () => showModule('spedizione'));
+
+
+  showModule('home'); // al inicio: SOLO HOME, ningún formulario
+
 })();
 </script>
 </body>
