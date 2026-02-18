@@ -73,9 +73,6 @@
   <div class="card">
     <h2 style="margin:0 0 10px; font-size:18px;">Richiesta acquisto — Modulo</h2>
 
-    <label>Richiedente (Nome e Cognome)</label>
-    <input id="acq_richiedente" type="text" placeholder="Es. Mario Rossi" />
-
     <label>Note generali (opzionale)</label>
     <textarea id="acq_note_generali" placeholder="Indicazioni generali..."></textarea>
 
@@ -393,7 +390,7 @@ function acqGetItems(){
 }
 
 function acqBuildSummary(){
-  const rich = (document.getElementById('acq_richiedente')?.value || '').trim();
+  const rich = (document.getElementById('richiedente')?.value || '').trim();
   const noteGen = (document.getElementById('acq_note_generali')?.value || '').trim();
   const items = acqGetItems();
 
@@ -469,7 +466,7 @@ async function acqCopySummary(){
 }
 
 function acqReset(){
-  document.getElementById('acq_richiedente').value = '';
+ 
   document.getElementById('acq_note_generali').value = '';
   document.getElementById('acq_items').innerHTML = '';
   document.getElementById('acq_output').textContent = 'Premi “Genera riepilogo”.';
