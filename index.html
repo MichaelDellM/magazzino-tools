@@ -72,9 +72,19 @@
 
 <!-- ===== HOME (solo 3 bottoni grandi) ===== -->
 <div id="modHome">
- 
+  <div class="card">
+    <h2 style="margin:0 0 10px; font-size:18px;">Seleziona modulo</h2>
+    <p class="muted" style="margin-top:0;">Scegli cosa vuoi fare.</p>
+
+    <div class="btnbar">
+      <button id="homeCodifica" class="primary" type="button">🧾 Codifica articoli</button>
+      <button id="homeAcquisto" type="button">🛒 Richiesta acquisto</button>
+      <button id="homeSpedizione" type="button">📦 Spedizione</button>
+    </div>
+  </div>
 </div>
-<!-- ===== /HOME ===== -->
+
+
 
 <!-- ===== MODULO: RICHIESTA ACQUISTO ===== -->
 <div id="modAcquisto" style="display:none;">
@@ -101,48 +111,41 @@
     </p>
   </div>
 
-  
+  <div class="card">
+    <div class="titleline">
+      <h2 style="margin:0; font-size:18px;">Riepilogo (Acquisto)</h2>
+      <div id="acq_status" class="muted"></div>
+    </div>
     <div class="hr"></div>
     <pre id="acq_output">Premi “Genera riepilogo”.</pre>
   </div>
 </div>
+
 <!-- ===== /MODULO: RICHIESTA CODIFICA ===== -->
 
- <div id="modCodifica" style="display:none;">
-
+<div id="modCodifica" style="display:none;">
   <div id="items"></div>
 
-<div class="btnbar">
-  <button id="addBtn" class="primary" type="button">
-    ➕ Aggiungi un altro articolo
-  </button>
+  <div class="btnbar">
+    <button id="addBtn" class="primary" type="button">➕ Aggiungi un altro articolo</button>
+    <button id="buildBtn" type="button">✅ Passo 1 — Genera riepilogo</button>
+    <button id="copyBtn" type="button">📋 Passo 2 — Copia il testo</button>
+    <a id="mailBtn" class="btn primary" href="#" role="button">✉️ Passo 3 — Finalizza e invia</a>
+    <button id="clearBtn" class="danger" type="button">🔄 Ripristina modulo</button>
+  </div>
 
-  <button id="buildBtn" type="button">
-    ✅ Passo 1 — Genera riepilogo
-  </button>
-
-  <button id="copyBtn" type="button">
-    📋 Passo 2 — Copia il testo
-  </button>
-
-  <a id="mailBtn" class="btn primary" href="#" role="button">
-    ✉️ Passo 3 — Finalizza e invia
-  </a>
-
-  <button id="clearBtn" class="danger" type="button">
-    🔄 Ripristina modulo
-  </button>
-</div>
-
-    <!-- tus botones -->
+  <div class="card">
+    <div class="titleline">
+      <h2 style="margin:0; font-size:18px;">Riepilogo (Codifica)</h2>
+      <div id="status" class="muted"></div>
+    </div>
+    <div class="hr"></div>
+    <pre id="output">Premi “Genera riepilogo”.</pre>
   </div>
 
   <p class="muted">
-    Nota: “Invia via email” ...
+    Nota: “Invia via email” usa l’app di posta predefinita del dispositivo (mailto). Se non si apre, copia il riepilogo e incollalo manualmente in Outlook.
   </p>
-
-  <!-- ✅ Riepilogo CODIFICA dentro del modulo -->
-
 </div>
 
 
