@@ -70,7 +70,8 @@
 
 <div class="hr"></div>
 
-<!-- ===== HOME (solo 3 bottoni grandi) ===== -->
+<!-- ===== HOME ===== -->
+      
 <div id="modHome">
   <div class="card">
     <h2 style="margin:0 0 10px; font-size:18px;">Seleziona modulo</h2>
@@ -79,9 +80,14 @@
   </div>
 </div>
 
+<!-------- FINE HOME -------->
 
 
+      
+
+      
 <!-- ===== MODULO: RICHIESTA ACQUISTO ===== -->
+      
 <div id="modAcquisto" style="display:none;">
   <div class="card">
     <h2 style="margin:0 0 10px; font-size:18px;">Richiesta acquisto — Modulo</h2>
@@ -116,7 +122,13 @@
   </div>
 </div>
 
-<!-- ===== /MODULO: RICHIESTA CODIFICA ===== -->
+<!-------- FINE MODULO: RICHIESTA ACQUISTO -------->
+
+
+
+
+      
+<!-- ===== MODULO: RICHIESTA CODIFICA ===== -->
 
 <div id="modCodifica" style="display:none;">
   <div id="items"></div>
@@ -143,14 +155,17 @@
   </p>
 </div>
 
+<!-------- FINE MODULO: RICHIESTA CODIFICA -------->
 
-<!-- ===== /MODULO: RICHIESTA SPEDIZIONE ===== -->
+
+
+
+      
+<!-- ===== MODULO: RICHIESTA SPEDIZIONE ===== -->
         
 <div id="modSpedizione" style="display:none;">
  
 </div>
-
-
       <p class="muted">
         Nota: “Invia via email” usa l’app di posta predefinita del dispositivo (mailto). Se non si apre, copia il riepilogo e incollalo manualmente in Outlook.
       </p>
@@ -160,14 +175,23 @@
     
       <div class="hr"></div>
       <pre id="output">Premi “Genera riepilogo”.</pre>
-      </div> <!-- fine modCodifica -->
-
+      </div> 
     </div>
   </div>
 
+<!-------- FINE MODULO: RICHIESTA SPEDIZIONE -------->
+
+
+
+
+  
 <script>
   const $ = (id) => document.getElementById(id);
 
+
+  
+  // ===== TEMPLATE CODIFICA ARTICOLO =====
+  
   const templateItem = (n) => `
     <div class="card" data-item>
       <div class="titleline">
@@ -224,11 +248,22 @@
       <textarea data-field="note" placeholder="Eventuali note..."></textarea>
     </div>
   `;
+
+
+
+
+  
 // === EMAILS FISSI (Acquisto) ===
+  
 const EMAIL_MICHAEL = "mdellorto@lindt.com";
 const EMAIL_FABIO   = "fcastagna@lindt.com";
 
+
+
+
+  
 // ===== TEMPLATE ARTICOLO ACQUISTO =====
+  
 const templateAcqItem = (n) => `
   <div class="card" data-acq-item>
     <div class="titleline">
@@ -323,6 +358,10 @@ const templateAcqItem = (n) => `
   </div>
 `;
 
+
+
+
+  
 function acqSetStatus(msg, ok=false){
   const el = document.getElementById('acq_status');
   if (!el) return;
@@ -609,7 +648,7 @@ function acqReset(){
   }
 
 // =====================
-// INIT UNICO (AL FINAL)
+// INIT UNICO
 // =====================
 (function initApp() {
   // --- Bind bottoni CODIFICA (safe) ---
