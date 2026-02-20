@@ -838,9 +838,9 @@ function spdReset(){
 (function initApp() {
   // --- Bind bottoni CODIFICA (safe) ---
   $('addBtn')?.addEventListener('click', addItem);
-  $('buildBtn')?.addEventListener('click', buildSummary);
-  $('copyBtn')?.addEventListener('click', copySummary);
-  $('clearBtn')?.addEventListener('click', resetAll);
+  $('buildBtn')?.addEventListener('click', codBuildSummary);
+  $('copyBtn')?.addEventListener('click', codCopySummary);
+  $('clearBtn')?.addEventListener('click', codReset);
 
   // --- Bind bottoni ACQUISTO (safe) ---
   document.getElementById('acq_addBtn')?.addEventListener('click', acqAddItem);
