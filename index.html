@@ -1,3 +1,5 @@
+<!-- ======== App Manutenzione 2.0 ======== -->
+
 <!doctype html>
 <html lang="it">
 <head>
@@ -157,71 +159,9 @@
 
       
 <!-- ===== MODULO: RICHIESTA SPEDIZIONE ===== -->
+        
 <div id="modSpedizione" style="display:none;">
-  <div class="card">
-    <h2 style="margin:0 0 10px; font-size:18px;">Spedizione — Modulo</h2>
-
-    <div class="row">
-      <div>
-        <label>Trasporto a cura di</label>
-        <div style="display:flex; gap:18px; padding:8px 2px; flex-wrap:wrap;">
-          <label style="display:flex; gap:8px; align-items:center; margin:0; font-size:14px; color:#e7eef7;">
-            <input type="radio" name="spd_trasporto" value="Mittente"> Mittente
-          </label>
-          <label style="display:flex; gap:8px; align-items:center; margin:0; font-size:14px; color:#e7eef7;">
-            <input type="radio" name="spd_trasporto" value="Destinatario" checked> Destinatario
-          </label>
-          <label style="display:flex; gap:8px; align-items:center; margin:0; font-size:14px; color:#e7eef7;">
-            <input type="radio" name="spd_trasporto" value="Vettore"> Vettore
-          </label>
-        </div>
-      </div>
-
-      <div>
-        <label>Destinatario</label>
-        <input id="spd_destinatario" type="text" placeholder="Ragione sociale + indirizzo (se disponibile)" />
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>N° Colli</label>
-        <input id="spd_colli" type="text" inputmode="numeric" placeholder="Es. 3" />
-      </div>
-      <div>
-        <label>Peso</label>
-        <input id="spd_peso" type="text" placeholder="Es. 12 kg" />
-      </div>
-    </div>
-
-    <label>Aspetto</label>
-    <input id="spd_aspetto" type="text" placeholder="Es. Scatole / Bancale / Imballo..." />
-
-    <div class="hr"></div>
-
-    <div id="spd_items"></div>
-
-    <div class="btnbar">
-      <button id="spd_addBtn" class="primary" type="button">➕ Aggiungi riga</button>
-      <button id="spd_buildBtn" type="button">✅ Passo 1 — Genera riepilogo</button>
-      <button id="spd_copyBtn" type="button">📋 Passo 2 — Copia il testo</button>
-      <a id="spd_mailBtn" class="btn primary" href="#" role="button">✉️ Passo 3 — Finalizza e invia</a>
-      <button id="spd_clearBtn" class="danger" type="button">🔄 Ripristina modulo</button>
-    </div>
-
-    <p class="muted">
-      Nota: “Invia via email” usa l’app di posta predefinita (mailto). Se non si apre, copia il riepilogo e incollalo manualmente in Outlook.
-    </p>
-  </div>
-
-  <div class="card">
-    <div class="titleline">
-      <h2 style="margin:0; font-size:18px;">Riepilogo (Spedizione)</h2>
-      <div id="spd_status" class="muted"></div>
-    </div>
-    <div class="hr"></div>
-    <pre id="spd_output">Premi “Genera riepilogo”.</pre>
-  </div>
+ 
 </div>
     
 
@@ -295,7 +235,7 @@
     </div>
   `;
 
-// ===== FINE TEMPLATE CODIFICA ARTICOLO =====
+
 
 
   
@@ -303,6 +243,8 @@
   
 const EMAIL_MICHAEL = "mdellorto@lindt.com";
 const EMAIL_FABIO   = "fcastagna@lindt.com";
+
+
 
 
   
@@ -402,11 +344,7 @@ const templateAcqItem = (n) => `
   </div>
 `;
 
-// ===== FINE TEMPLATE ARTICOLO ACQUISTO =====
 
-
-
-  
 
 // ====== FUNZIONI JS ACQUISTI ======
   
@@ -619,228 +557,90 @@ function acqReset(){
 
   // ------ FINE FUNZIONI JS ACQUISTI ------
 
+  function buildSummary(){
+    const email = "mdellorto@lindt.com";
+    const richiedente = $('richiedente')?.value.trim() || '';
+    const items = getItemsData();
 
-
-  
-
-// ====== FUNZIONI JS SPEDIZIONE ======
-
-
-const EMAIL_SPED_TO = EMAIL_MICHAEL;  
-const EMAIL_SPED_CC = EMAIL_FABIO;     
-
-const templateSpdItem = (n) => `
-  <div class="card" data-spd-item>
-    <div class="titleline">
-      <strong>Riga ${n}</strong>
-      <button type="button" class="danger" onclick="removeSpdItem(this)">Rimuovi</button>
-    </div>
-
-    <label>Descrizione</label>
-    <input data-spd="descrizione" type="text" placeholder="Descrizione materiale / articolo..." />
-
-    <div class="row">
-      <div>
-        <label>Q.tà</label>
-        <input data-spd="qta" type="text" inputmode="numeric" placeholder="Es. 2" />
-      </div>
-
-      <div>
-        <label>Cau.</label>
-        <select data-spd="cau">
-          <option value="">(seleziona)</option>
-
-          <optgroup label="Resi / Riparazioni / Trasferimenti">
-            <option value="RGA">RGA — Reso in garanzia</option>
-            <option value="RSN">RSN — Reso non conforme</option>
-            <option value="ROM">ROM — Reso omaggio</option>
-            <option value="RST">RST — Restituzione</option>
-            <option value="RIE">RIE — Rientro in sede</option>
-            <option value="RIP">RIP — Riparazione</option>
-            <option value="SMA">SMA — Smaltimento</option>
-            <option value="TCD">TCD — Trasf c/deposito</option>
-            <option value="TRA">TRA — Trasf. sede secondaria</option>
-            <option value="TRR">TRR — Trasferimento</option>
-            <option value="INT">INT — Trasporto interno</option>
-            <option value="VEN">VEN — Vendita</option>
-            <option value="VEA">VEA — Vendita da neg. azien.</option>
-            <option value="VIS">VIS — Visione</option>
-          </optgroup>
-
-          <optgroup label="Prove / Produzione / Macchina">
-            <option value="PRD">PRD — Prove di dosaggio</option>
-            <option value="PDP">PDP — Prove di produzione</option>
-            <option value="PRM">PRM — Prove macchina</option>
-          </optgroup>
-
-          <optgroup label="Resi (varianti)">
-            <option value="REI">REI — Reso</option>
-            <option value="RFO">RFO — Reso a fornitore</option>
-            <option value="RCD">RCD — Reso c/deposito</option>
-            <option value="RES">RES — Reso c/lavorazione</option>
-            <option value="RRI">RRI — Reso c/riparazione</option>
-            <option value="ION">ION — Reso c/sostituzione</option>
-            <option value="REV">REV — Reso c/visione</option>
-            <option value="RCO">RCO — Reso comodato</option>
-            <option value="RCG">RCG — Reso comodato gratuito</option>
-            <option value="REL">REL — Reso da c/locazione</option>
-            <option value="RCN">RCN — Reso da c/noleggio</option>
-            <option value="RPU">RPU — Reso da prestito d'uso</option>
-            <option value="RSO">RSO — Reso da sostituzione definitiva</option>
-          </optgroup>
-
-          <optgroup label="Altri">
-            <option value="ALL">ALL — C/Allestimento</option>
-            <option value="CPR">CPR — Camp. per prove</option>
-            <option value="CAM">CAM — Campionario</option>
-            <option value="ANA">ANA — Campioni per analisi</option>
-            <option value="CAR">CAR — Carico c/deposito</option>
-            <option value="CES">CES — Cessione gratuita</option>
-            <option value="COM">COM — Comodato</option>
-            <option value="COG">COG — Comodato gratuito</option>
-            <option value="DEP">DEP — Conto deposito</option>
-            <option value="LAV">LAV — Conto/lavorazione</option>
-            <option value="PRO">PRO — Mat. promozionale</option>
-            <option value="SOS">SOS — Merce in sostituzione</option>
-            <option value="MOD">MOD — Modifica</option>
-            <option value="PRE">PRE — Prestito d'uso</option>
-            <option value="TES">TES — Prodotto per test</option>
-            <option value="PRC">PRC — Prove di confezione</option>
-          </optgroup>
-        </select>
-      </div>
-    </div>
-  </div>
-`;
-
-function spdSetStatus(msg, ok=false){
-  const el = document.getElementById('spd_status');
-  if (!el) return;
-  el.textContent = msg;
-  el.className = ok ? 'muted ok' : 'muted';
-  clearTimeout(window.__spdst);
-  window.__spdst = setTimeout(()=>{ el.textContent=''; }, 3500);
-}
-
-function spdRenumber(){
-  document.querySelectorAll('[data-spd-item]').forEach((card, idx) => {
-    const title = card.querySelector('strong');
-    if (title) title.textContent = `Riga ${idx + 1}`;
-  });
-}
-
-window.removeSpdItem = (btn) => {
-  btn.closest('[data-spd-item]')?.remove();
-  spdRenumber();
-  spdSetStatus('Riga rimossa.');
-};
-
-function spdAddItem(){
-  const container = document.getElementById('spd_items');
-  const n = container.querySelectorAll('[data-spd-item]').length + 1;
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = templateSpdItem(n);
-  container.appendChild(wrapper.firstElementChild);
-  spdSetStatus('Riga aggiunta.');
-}
-
-function spdGetTrasporto(){
-  return document.querySelector('input[name="spd_trasporto"]:checked')?.value || '';
-}
-
-function spdGetItems(){
-  return Array.from(document.querySelectorAll('[data-spd-item]')).map((card, idx) => {
-    const get = (name) => (card.querySelector(`[data-spd="${name}"]`)?.value || '').trim();
-    return {
-      idx: idx + 1,
-      descrizione: get('descrizione'),
-      qta: get('qta'),
-      cau: get('cau'),
-      cau_label: card.querySelector(`[data-spd="cau"] option:checked`)?.textContent?.trim() || ''
-    };
-  });
-}
-
-function spdBuildSummary(){
-  const rich = (document.getElementById('richiedente')?.value || '').trim();
-  const trasporto = spdGetTrasporto();
-  const destinatario = (document.getElementById('spd_destinatario')?.value || '').trim();
-  const colli = (document.getElementById('spd_colli')?.value || '').trim();
-  const peso = (document.getElementById('spd_peso')?.value || '').trim();
-  const aspetto = (document.getElementById('spd_aspetto')?.value || '').trim();
-
-  const items = spdGetItems();
-
-  const lines = [];
-  lines.push('RICHIESTA SPEDIZIONE (DDT)');
-  lines.push('--------------------------------');
-  lines.push(`Richiedente: ${rich || '(non indicato)'}`);
-  lines.push(`Trasporto a cura di: ${trasporto || '(non indicato)'}`);
-  lines.push(`Destinatario: ${destinatario || '(non indicato)'}`);
-  if (colli) lines.push(`N° Colli: ${colli}`);
-  if (peso) lines.push(`Peso: ${peso}`);
-  if (aspetto) lines.push(`Aspetto: ${aspetto}`);
-  lines.push('');
-  lines.push(`Numero righe: ${items.length}`);
-  lines.push('');
-
-  items.forEach(it => {
-    lines.push(`RIGA ${it.idx}`);
-    if (it.descrizione) lines.push(`- Descrizione: ${it.descrizione}`);
-    if (it.qta) lines.push(`- Q.tà: ${it.qta}`);
-    if (it.cau) lines.push(`- Cau.: ${it.cau_label || it.cau}`);
+    const lines = [];
+    lines.push('Richiesta codifica articoli');
+    lines.push('--------------------------------');
+    if (richiedente) lines.push(`Richiedente: ${richiedente}`);
+    lines.push(`Numero articoli: ${items.length}`);
     lines.push('');
-  });
 
-  lines.push('Grazie.');
-  const text = lines.join('\n');
+    items.forEach(it => {
+      lines.push(`ARTICOLO ${it.idx}`);
+      if (it.tipo)        lines.push(`- Tipo articolo: ${it.tipo}`);
+      if (it.descrizione) lines.push(`- Nome/Descrizione: ${it.descrizione}`);
+      if (it.linea)       lines.push(`- Linea: ${it.linea}`);
+      if (it.fornitore)   lines.push(`- Fornitore: ${it.fornitore}`);
+      if (it.costruttore) lines.push(`- Costruttore: ${it.costruttore}`);
+      if (it.ubicazione)  lines.push(`- Ubicazione: ${it.ubicazione}`);
+      if (it.min || it.max){
+        const min = it.min || '(vuoto)';
+        const max = it.max || '(vuoto)';
+        lines.push(`- Approvvigionamento (Min / Max): ${min} / ${max}`);
+      }
+      if (it.note)        lines.push(`- Note: ${it.note}`);
+      lines.push('');
+    });
 
-  document.getElementById('spd_output').textContent = text;
+    lines.push('Grazie.');
+    const text = lines.join('\n');
 
-  const subject = encodeURIComponent('Richiesta spedizione (DDT)');
-  const body = encodeURIComponent(text);
-  const to = encodeURIComponent(EMAIL_SPED_TO);
-  const cc = encodeURIComponent(EMAIL_SPED_CC);
+    $('output').textContent = text;
 
-  document.getElementById('spd_mailBtn').href =
-    `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
+    // mailto link (subject + body)
+    const subject = encodeURIComponent('Richiesta codifica articoli');
+    const body = encodeURIComponent(text);
+    $('mailBtn').href = `mailto:mdellorto@lindt.com?subject=${subject}&body=${body}`;
 
-  spdSetStatus('Riepilogo generato. ✅', true);
-  return text;
-}
-
-async function spdCopySummary(){
-  const text = spdBuildSummary();
-  try {
-    await navigator.clipboard.writeText(text);
-    spdSetStatus('Copiato negli appunti. ✅', true);
-  } catch {
-    spdSetStatus('Clipboard bloccato: copia manualmente dal riepilogo.', false);
+    setStatus('Riepilogo generato. ✅', true);
+    return text;
   }
-}
 
-function spdReset(){
-  document.getElementById('spd_destinatario').value = '';
-  document.getElementById('spd_colli').value = '';
-  document.getElementById('spd_peso').value = '';
-  document.getElementById('spd_aspetto').value = '';
-  document.getElementById('spd_items').innerHTML = '';
-  document.getElementById('spd_output').textContent = 'Premi “Genera riepilogo”.';
-  spdAddItem();
-  spdSetStatus('Ripristinato.');
-}
+  async function copySummary(){
+    const text = buildSummary();
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus('Copiato negli appunti. ✅', true);
+    } catch (e){
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setStatus('Copiato (fallback). ✅', true);
+    }
+  }
 
+  function resetAll(){
+    $('items').innerHTML = '';
+    addItem();
+    $('output').textContent = 'Premi “Genera riepilogo”.';
+    setStatus('Resettato.');
+  }
 
-  
+  function setStatus(msg, ok=false){
+    const el = $('status');
+    el.textContent = msg;
+    el.className = ok ? 'muted ok' : 'muted';
+    clearTimeout(window.__st);
+    window.__st = setTimeout(()=>{ el.textContent=''; }, 3500);
+  }
 
+// =====================
 // INIT UNICO
-
+// =====================
 (function initApp() {
   // --- Bind bottoni CODIFICA (safe) ---
   $('addBtn')?.addEventListener('click', addItem);
-  $('buildBtn')?.addEventListener('click', codBuildSummary);
-  $('copyBtn')?.addEventListener('click', codCopySummary);
-  $('clearBtn')?.addEventListener('click', codReset);
+  $('buildBtn')?.addEventListener('click', buildSummary);
+  $('copyBtn')?.addEventListener('click', copySummary);
+  $('clearBtn')?.addEventListener('click', resetAll);
 
   // --- Bind bottoni ACQUISTO (safe) ---
   document.getElementById('acq_addBtn')?.addEventListener('click', acqAddItem);
@@ -848,19 +648,10 @@ function spdReset(){
   document.getElementById('acq_copyBtn')?.addEventListener('click', acqCopySummary);
   document.getElementById('acq_clearBtn')?.addEventListener('click', acqReset);
 
-    // --- Bind bottoni SPEDIZIONE (safe) ---
-  document.getElementById('spd_addBtn')?.addEventListener('click', spdAddItem);
-  document.getElementById('spd_buildBtn')?.addEventListener('click', spdBuildSummary);
-  document.getElementById('spd_copyBtn')?.addEventListener('click', spdCopySummary);
-  document.getElementById('spd_clearBtn')?.addEventListener('click', spdReset);
-
-
   // --- Crea 1 articolo per modulo (solo se vuoto) ---
   if (document.querySelectorAll('[data-item]').length === 0) addItem();
   if (document.querySelectorAll('[data-acq-item]').length === 0) acqAddItem();
-   if (document.querySelectorAll('[data-spd-item]').length === 0) spdAddItem();
 
-  
   // --- LOGICA MOSTRA/NASCONDI MODULI ---
  function showModule(which){
   const home = document.getElementById('modHome');
