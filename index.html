@@ -159,7 +159,73 @@
 <!-- ===== MODULO: RICHIESTA SPEDIZIONE ===== -->
         
 <div id="modSpedizione" style="display:none;">
- 
+  <div class="card">
+    <h2 style="margin:0 0 10px; font-size:18px;">Spedizione — Modulo</h2>
+
+    <div class="row">
+      <div>
+        <label>Trasporto a cura di</label>
+        <div class="row" style="grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+          <label style="display:flex; align-items:center; gap:8px; margin:0;">
+            <input type="radio" name="spd_trasporto" value="Mittente" checked>
+            Mittente
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; margin:0;">
+            <input type="radio" name="spd_trasporto" value="Destinatario">
+            Destinatario
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; margin:0;">
+            <input type="radio" name="spd_trasporto" value="Vettore">
+            Vettore
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <label>Destinatario</label>
+        <input id="spd_destinatario" type="text" placeholder="Ragione sociale + indirizzo (se disponibile)" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>N° Colli</label>
+        <input id="spd_colli" type="text" inputmode="numeric" placeholder="Es. 3" />
+      </div>
+      <div>
+        <label>Peso</label>
+        <input id="spd_peso" type="text" placeholder="Es. 12 kg" />
+      </div>
+    </div>
+
+    <label>Aspetto</label>
+    <input id="spd_aspetto" type="text" placeholder="Es. Scatole / Bancale / Imballo..." />
+
+    <div class="hr"></div>
+
+    <div id="spd_items"></div>
+
+    <div class="btnbar">
+      <button id="spd_addBtn" class="primary" type="button">➕ Aggiungi riga</button>
+      <button id="spd_buildBtn" type="button">✅ Passo 1 — Genera riepilogo</button>
+      <button id="spd_copyBtn" type="button">📋 Passo 2 — Copia il testo</button>
+      <a id="spd_mailBtn" class="btn primary" href="#" role="button">✉️ Passo 3 — Finalizza e invia</a>
+      <button id="spd_clearBtn" class="danger" type="button">🔄 Ripristina modulo</button>
+    </div>
+
+    <p class="muted">
+      Nota: l’invio usa l’app di posta predefinita (mailto). Se non si apre, copia il riepilogo e incollalo manualmente in Outlook.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="titleline">
+      <h2 style="margin:0; font-size:18px;">Riepilogo (Spedizione)</h2>
+      <div id="spd_status" class="muted"></div>
+    </div>
+    <div class="hr"></div>
+    <pre id="spd_output">Premi “Genera riepilogo”.</pre>
+  </div>
 </div>
     
 
@@ -233,7 +299,7 @@
     </div>
   `;
 
-
+// ===== FINE TEMPLATE CODIFICA ARTICOLO =====
 
 
   
@@ -241,8 +307,6 @@
   
 const EMAIL_MICHAEL = "mdellorto@lindt.com";
 const EMAIL_FABIO   = "fcastagna@lindt.com";
-
-
 
 
   
@@ -342,7 +406,175 @@ const templateAcqItem = (n) => `
   </div>
 `;
 
+// ===== FINE TEMPLATE ARTICOLO ACQUISTO =====
 
+
+
+
+// TEMPLATE + FUNZIONI JS SPEDIZIONE
+
+
+const EMAIL_SPEDIZIONI_TO = EMAIL_MICHAEL; 
+
+const templateSpdItem = (n) => `
+  <div class="card" data-spd-item>
+    <div class="titleline">
+      <strong>Riga ${n}</strong>
+      <button type="button" class="danger" onclick="removeSpdItem(this)">Rimuovi</button>
+    </div>
+
+    <label>Descrizione</label>
+    <input data-spd="descrizione" type="text" placeholder="Descrizione materiale / articolo..." />
+
+    <div class="row">
+      <div>
+        <label>Q.tà</label>
+        <input data-spd="qty" type="text" inputmode="numeric" placeholder="Es. 2" />
+      </div>
+      <div>
+        <label>Cau.</label>
+        <input data-spd="causale" type="text" placeholder="Es. Reso / Riparazione / Trasferimento..." />
+      </div>
+    </div>
+  </div>
+`;
+
+function spdSetStatus(msg, ok=false){
+  const el = document.getElementById('spd_status');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = ok ? 'muted ok' : 'muted';
+  clearTimeout(window.__spdst);
+  window.__spdst = setTimeout(()=>{ el.textContent=''; }, 3500);
+}
+
+function spdRenumber(){
+  const cards = document.querySelectorAll('[data-spd-item]');
+  cards.forEach((card, idx) => {
+    const title = card.querySelector('strong');
+    if (title) title.textContent = `Riga ${idx + 1}`;
+  });
+}
+
+window.removeSpdItem = (btn) => {
+  const card = btn.closest('[data-spd-item]');
+  if (card) card.remove();
+  spdRenumber();
+  spdSetStatus('Riga rimossa.');
+};
+
+function spdAddItem(){
+  const container = document.getElementById('spd_items');
+  const n = container.querySelectorAll('[data-spd-item]').length + 1;
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = templateSpdItem(n);
+  container.appendChild(wrapper.firstElementChild);
+  spdSetStatus('Riga aggiunta.');
+}
+
+function spdGetTrasporto(){
+  const checked = document.querySelector('input[name="spd_trasporto"]:checked');
+  return (checked?.value || '').trim();
+}
+
+function spdGetItems(){
+  const cards = document.querySelectorAll('[data-spd-item]');
+  return Array.from(cards).map((card, idx) => {
+    const get = (name) => (card.querySelector(`[data-spd="${name}"]`)?.value || '').trim();
+    return {
+      idx: idx + 1,
+      descrizione: get('descrizione'),
+      qty: get('qty'),
+      causale: get('causale'),
+    };
+  });
+}
+
+function spdBuildSummary(){
+  const rich = (document.getElementById('richiedente')?.value || '').trim();
+
+  const trasporto = spdGetTrasporto();
+  const destinatario = (document.getElementById('spd_destinatario')?.value || '').trim();
+  const colli = (document.getElementById('spd_colli')?.value || '').trim();
+  const peso = (document.getElementById('spd_peso')?.value || '').trim();
+  const aspetto = (document.getElementById('spd_aspetto')?.value || '').trim();
+
+  const items = spdGetItems();
+
+  const lines = [];
+  lines.push('SPEDIZIONE / DDT');
+  lines.push('--------------------------------');
+  lines.push(`Richiedente: ${rich || '(non indicato)'}`);
+  if (trasporto) lines.push(`Trasporto a cura di: ${trasporto}`);
+  if (destinatario) lines.push(`Destinatario: ${destinatario}`);
+  if (colli) lines.push(`N° Colli: ${colli}`);
+  if (peso) lines.push(`Peso: ${peso}`);
+  if (aspetto) lines.push(`Aspetto: ${aspetto}`);
+  lines.push(`Numero righe: ${items.length}`);
+  lines.push('');
+
+  items.forEach(it => {
+    lines.push(`RIGA ${it.idx}`);
+    if (it.descrizione) lines.push(`- Descrizione: ${it.descrizione}`);
+    if (it.qty) lines.push(`- Q.tà: ${it.qty}`);
+    if (it.causale) lines.push(`- Cau.: ${it.causale}`);
+    lines.push('');
+  });
+
+  lines.push('Grazie.');
+  const text = lines.join('\n');
+
+  document.getElementById('spd_output').textContent = text;
+
+  const subject = encodeURIComponent('Spedizione / DDT');
+  const body = encodeURIComponent(text);
+
+  const to = encodeURIComponent(EMAIL_SPEDIZIONI_TO);
+  // Si quieres CC a Fabio, descomenta:
+  // const cc = encodeURIComponent(EMAIL_FABIO);
+  // document.getElementById('spd_mailBtn').href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
+  document.getElementById('spd_mailBtn').href = `mailto:${to}?subject=${subject}&body=${body}`;
+
+  spdSetStatus('Riepilogo generato. ✅', true);
+  return text;
+}
+
+async function spdCopySummary(){
+  const text = spdBuildSummary();
+  try {
+    await navigator.clipboard.writeText(text);
+    spdSetStatus('Copiato negli appunti. ✅', true);
+  } catch (e){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    spdSetStatus('Copiato (fallback). ✅', true);
+  }
+}
+
+function spdReset(){
+  document.getElementById('spd_destinatario').value = '';
+  document.getElementById('spd_colli').value = '';
+  document.getElementById('spd_peso').value = '';
+  document.getElementById('spd_aspetto').value = '';
+
+  // reset radio a Mittente
+  const r = document.querySelector('input[name="spd_trasporto"][value="Mittente"]');
+  if (r) r.checked = true;
+
+  document.getElementById('spd_items').innerHTML = '';
+  document.getElementById('spd_output').textContent = 'Premi “Genera riepilogo”.';
+
+  spdAddItem();
+  spdSetStatus('Ripristinato.');
+}
+
+
+
+  
 
 // ====== FUNZIONI JS ACQUISTI ======
   
@@ -646,10 +878,19 @@ function acqReset(){
   document.getElementById('acq_copyBtn')?.addEventListener('click', acqCopySummary);
   document.getElementById('acq_clearBtn')?.addEventListener('click', acqReset);
 
+    // --- Bind bottoni SPEDIZIONE (safe) ---
+  document.getElementById('spd_addBtn')?.addEventListener('click', spdAddItem);
+  document.getElementById('spd_buildBtn')?.addEventListener('click', spdBuildSummary);
+  document.getElementById('spd_copyBtn')?.addEventListener('click', spdCopySummary);
+  document.getElementById('spd_clearBtn')?.addEventListener('click', spdReset);
+
+
   // --- Crea 1 articolo per modulo (solo se vuoto) ---
   if (document.querySelectorAll('[data-item]').length === 0) addItem();
   if (document.querySelectorAll('[data-acq-item]').length === 0) acqAddItem();
+   if (document.querySelectorAll('[data-spd-item]').length === 0) spdAddItem();
 
+  
   // --- LOGICA MOSTRA/NASCONDI MODULI ---
  function showModule(which){
   const home = document.getElementById('modHome');
