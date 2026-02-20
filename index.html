@@ -92,11 +92,6 @@
   <div class="card">
     <h2 style="margin:0 0 10px; font-size:18px;">Richiesta acquisto — Modulo</h2>
 
-    <label>Note generali (opzionale)</label>
-    <textarea id="acq_note_generali" placeholder="Indicazioni generali..."></textarea>
-
-    <div class="hr"></div>
-
     <div id="acq_items"></div>
 
     <div class="btnbar">
@@ -360,7 +355,7 @@ const templateAcqItem = (n) => `
 
 
 
-
+// ====== FUNZIONI JS ACQUISTI ======
   
 function acqSetStatus(msg, ok=false){
   const el = document.getElementById('acq_status');
@@ -443,10 +438,9 @@ function acqGetItems(){
     };
   });
 }
-
+  
 function acqBuildSummary(){
   const rich = (document.getElementById('richiedente')?.value || '').trim();
-  const noteGen = (document.getElementById('acq_note_generali')?.value || '').trim();
   const items = acqGetItems();
 
   const lines = [];
@@ -454,7 +448,6 @@ function acqBuildSummary(){
   lines.push('--------------------------------');
   lines.push(`Richiedente: ${rich || '(non indicato)'}`);
   lines.push(`Numero articoli: ${items.length}`);
-  if (noteGen) lines.push(`Note generali: ${noteGen}`);
   lines.push('');
 
   items.forEach(it => {
@@ -522,7 +515,6 @@ async function acqCopySummary(){
 
 function acqReset(){
  
-  document.getElementById('acq_note_generali').value = '';
   document.getElementById('acq_items').innerHTML = '';
   document.getElementById('acq_output').textContent = 'Premi “Genera riepilogo”.';
   acqAddItem();
@@ -571,6 +563,8 @@ function acqReset(){
       };
     });
   }
+
+  // ------ FINE FUNZIONI JS ACQUISTI ------
 
   function buildSummary(){
     const email = "mdellorto@lindt.com";
