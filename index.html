@@ -296,18 +296,10 @@
     </div>
   `;
 
-
+ // ------- FINE TEMPLATE CODIFICA ARTICOLO --------
 
 
   
-// === EMAILS FISSI (Acquisto) ===
-  
-const EMAIL_MICHAEL = "mdellorto@lindt.com";
-const EMAIL_FABIO   = "fcastagna@lindt.com";
-
-
-
-
   
 // ===== TEMPLATE ARTICOLO ACQUISTO =====
   
@@ -405,8 +397,19 @@ const templateAcqItem = (n) => `
   </div>
 `;
 
+// ------ FINE TEMPLATE ARTICOLO ACQUISTO ------
 
 
+
+  
+// === EMAILS FISSI  ===
+  
+const EMAIL_MICHAEL = "mdellorto@lindt.com";
+const EMAIL_FABIO   = "fcastagna@lindt.com";
+
+
+
+  
 // ====== FUNZIONI JS ACQUISTI ======
   
 function acqSetStatus(msg, ok=false){
@@ -652,7 +655,11 @@ function acqReset(){
 
     $('output').textContent = text;
 
-    // mailto link (subject + body)
+
+    
+
+    // ======== MAILTO link (subject + body) =========
+    
     const subject = encodeURIComponent('Richiesta codifica articoli');
     const body = encodeURIComponent(text);
     $('mailBtn').href = `mailto:mdellorto@lindt.com?subject=${subject}&body=${body}`;
@@ -667,7 +674,11 @@ function acqReset(){
       await navigator.clipboard.writeText(text);
       setStatus('Copiato negli appunti. ✅', true);
     } catch (e){
+
+
+      
       // fallback
+      
       const ta = document.createElement('textarea');
       ta.value = text;
       document.body.appendChild(ta);
@@ -696,9 +707,9 @@ function acqReset(){
 
 
 
-// ===============================
+
 // ====== SPEDIZIONE (DDT) ========
-// ===============================
+
 
 const EMAIL_SPED_TO = EMAIL_MICHAEL;   // TO: Michael
 const EMAIL_SPED_CC = EMAIL_FABIO;     // CC: Fabio
@@ -916,7 +927,7 @@ function spdReset(){
   
 
 
-  
+
 
 // =====================
 // INIT UNICO
