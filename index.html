@@ -731,7 +731,10 @@ const templateSpdItem = (n) => `
     </div>
 
     <label>Descrizione</label>
-    <input data-spd="descrizione" type="text" placeholder="Descrizione materiale / articolo..." />
+<input data-spd="descrizione" type="text" placeholder="Descrizione materiale / articolo..." />
+
+<label>Anomalia / Descrizione del guasto</label>
+<textarea data-spd="guasto" placeholder="Es. rumore anomalo, perdita olio, non si accende, cuscinetto bloccato..."></textarea>
 
     <div class="row">
       <div>
@@ -841,6 +844,7 @@ function spdGetItems(){
     return {
       idx: idx + 1,
       descrizione: get('descrizione'),
+      guasto: get('guasto'),
       qta: get('qta'),
       cau: get('cau'),
       cau_label: cauLabel
@@ -875,6 +879,7 @@ function spdBuildSummary(){
   items.forEach(it => {
     lines.push(`RIGA ${it.idx}`);
     if (it.descrizione) lines.push(`- Descrizione: ${it.descrizione}`);
+    if (it.guasto) lines.push(`- Anomalia/Guasto: ${it.guasto}`);
     if (it.qta) lines.push(`- Q.tà: ${it.qta}`);
     if (it.cau) lines.push(`- Cau.: ${it.cau_label || it.cau}`);
     lines.push('');
