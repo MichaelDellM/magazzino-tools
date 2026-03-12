@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tutoriali | App Manutenzione</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #0b0f14;
+      color: #e7eef7;
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+    }
+    p {
+      margin: 0 0 16px;
+      color: #b9c7d8;
+    }
+    .card {
+      background: #121826;
+      border: 1px solid #1f2a3a;
+      border-radius: 14px;
+      padding: 16px;
+      margin: 14px 0;
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    }
+    .titleline {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .pill {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #2a3a54;
+      background: #0e1420;
+      color: #b9c7d8;
+    }
+    .btnbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    button, a.btn {
+      border: 1px solid #2a3a54;
+      background: #172235;
+      color: #e7eef7;
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button.primary, a.btn.primary {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+    button:hover, a.btn:hover {
+      filter: brightness(1.08);
+    }
+    .muted {
+      color: #9fb3c8;
+      font-size: 12px;
+    }
+    .video-box {
+      margin-top: 14px;
+      display: none;
+    }
+    video {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 12px;
+      border: 1px solid #223047;
+      background: black;
+    }
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+    .hr {
+      height: 1px;
+      background: #1f2a3a;
+      margin: 14px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="titleline">
+        <div>
+          <h1>Tutoriali — App Manutenzione</h1>
+          <p>Seleziona il tutoriale che vuoi visualizzare.</p>
+        </div>
+        <div class="pill">Lingua: Italiano</div>
+      </div>
+
+      <div class="btnbar">
+        <a class="btn" href="./index.html">⬅ Torna alla App</a>
+        <button id="btnTutCodifica" class="primary" type="button">🎥 Tutorial Codifica Articoli</button>
+        <button id="btnTutAcquisto" type="button">🎥 Tutorial Richiesta Acquisto</button>
+        <button id="btnTutSpedizione" type="button">🎥 Tutorial Spedizione</button>
+      </div>
+
+      <p class="muted" style="margin-top:12px;">
+        Nota: puoi sostituire i video demo con quelli definitivi quando saranno pronti.
+      </p>
+    </div>
+
+    <div id="boxCodifica" class="card video-box">
+      <h2 class="section-title">Tutorial — Codifica Articoli</h2>
+      <p>Video guida per l’utilizzo del modulo Codifica Articoli.</p>
+      <video controls>
+        <source src="tutoriali/codifica.mp4" type="video/mp4">
+        Il tuo browser non supporta il video.
+      </video>
+    </div>
+
+    <div id="boxAcquisto" class="card video-box">
+      <h2 class="section-title">Tutorial — Richiesta Acquisto</h2>
+      <p>Video guida per l’utilizzo del modulo Richiesta Acquisto.</p>
+      <video controls>
+        <source src="tutoriali/acquisto.mp4" type="video/mp4">
+        Il tuo browser non supporta il video.
+      </video>
+    </div>
+
+    <div id="boxSpedizione" class="card video-box">
+      <h2 class="section-title">Tutorial — Spedizione</h2>
+      <p>Video guida per l’utilizzo del modulo Spedizione.</p>
+      <video controls>
+        <source src="tutoriali/spedizione.mp4" type="video/mp4">
+        Il tuo browser non supporta il video.
+      </video>
+    </div>
+  </div>
+
+  <script>
+    function hideAllTutorials() {
+      document.getElementById('boxCodifica').style.display = 'none';
+      document.getElementById('boxAcquisto').style.display = 'none';
+      document.getElementById('boxSpedizione').style.display = 'none';
+
+      document.getElementById('btnTutCodifica').classList.remove('primary');
+      document.getElementById('btnTutAcquisto').classList.remove('primary');
+      document.getElementById('btnTutSpedizione').classList.remove('primary');
+    }
+
+    function showTutorial(which) {
+      hideAllTutorials();
+
+      if (which === 'codifica') {
+        document.getElementById('boxCodifica').style.display = 'block';
+        document.getElementById('btnTutCodifica').classList.add('primary');
+      }
+
+      if (which === 'acquisto') {
+        document.getElementById('boxAcquisto').style.display = 'block';
+        document.getElementById('btnTutAcquisto').classList.add('primary');
+      }
+
+      if (which === 'spedizione') {
+        document.getElementById('boxSpedizione').style.display = 'block';
+        document.getElementById('btnTutSpedizione').classList.add('primary');
+      }
+    }
+
+    document.getElementById('btnTutCodifica').addEventListener('click', () => showTutorial('codifica'));
+    document.getElementById('btnTutAcquisto').addEventListener('click', () => showTutorial('acquisto'));
+    document.getElementById('btnTutSpedizione').addEventListener('click', () => showTutorial('spedizione'));
+  </script>
+</body>
+</html>
