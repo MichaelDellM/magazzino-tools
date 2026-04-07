@@ -1,4 +1,4 @@
-<!-- XXXXXXXXXX App Manutenzione 2.0 XXXXXXXXXX -->
+<!-- XXXXXXXXXX App Manutenzione 4.3 XXXXXXXXXX -->
 
 <!doctype html>
 <html lang="it">
@@ -392,6 +392,22 @@ const templateAcqItem = (n) => `
       <option value="Prova">Prova</option>
     </select>
 
+    <!-- Aviso llegada -->
+<label>Avvisare quando arriva l’articolo?</label>
+<div style="display:flex; gap:18px; padding:6px 2px;">
+  <label style="display:flex; gap:8px; align-items:center;">
+    <input type="checkbox" data-acq="avviso_arrivo"> Sì, avvisare
+  </label>
+</div>
+
+<!-- Destinazione articolo -->
+<label>Quando arriva l’articolo</label>
+<select data-acq="destinazione">
+  <option value="">(seleziona)</option>
+  <option value="Magazzino">Mettere a magazzino</option>
+  <option value="Non a magazzino">Non va a magazzino</option>
+</select>
+
     <label>Note (opzionale)</label>
     <textarea data-acq="note" placeholder="Note sull’articolo..."></textarea>
   </div>
@@ -488,6 +504,8 @@ function acqGetItems(){
       macchina_linea: get('macchina_linea'),
       riferimento: get('riferimento'),
       motivo: get('motivo'),
+      avviso_arrivo: card.querySelector('[data-acq="avviso_arrivo"]')?.checked || false,
+      destinazione: get('destinazione'),
       urgenza: get('urgenza'),
       note: get('note'),
     };
@@ -530,6 +548,9 @@ function acqBuildSummary(){
     if (it.macchina_linea) lines.push(`- Macchina/Linea d’uso: ${it.macchina_linea}`);
     if (it.riferimento) lines.push(`- Riferimento: ${it.riferimento}`);
     if (it.motivo) lines.push(`- Motivo: ${it.motivo}`);
+    if (it.avviso_arrivo) lines.push(`- Avvisare all’arrivo: SÌ`);
+    else lines.push(`- Avvisare all’arrivo: NO`);
+    if (it.destinazione) lines.push(`- Destinazione: ${it.destinazione}`);
     if (it.note) lines.push(`- Note: ${it.note}`);
     lines.push('');
   });
