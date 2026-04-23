@@ -1,4 +1,4 @@
-<!-- XXXXXXXXXX App Manutenzione 4.3 XXXXXXXXXX -->
+<!-- XXXXXXXXXX App Manutenzione 4.5 XXXXXXXXXX -->
 
 <!doctype html>
 <html lang="it">
@@ -82,7 +82,7 @@
   </div>
 </div>
 
-<!-- oooooooooo FINE HOME oooooooooo>
+<!-- oooooooooo FIN HOME oooooooooo>
 
 
       
@@ -119,7 +119,7 @@
   </div>
 </div>
 
-<!--oooooooooo FINE MODULO: RICHIESTA ACQUISTO oooooooooo>
+<!--oooooooooo Fin Modulo: RICHIESTA ACQUISTO oooooooooo>
 
 
 
@@ -152,7 +152,7 @@
   </p>
 </div>
 
-<!--oooooooooo FINE MODULO: RICHIESTA CODIFICA oooooooooo>
+<!--oooooooooo Fin Modulo: RICHIESTA CODIFICA oooooooooo>
 
 
 
@@ -227,7 +227,7 @@
   </div>
 </div>
       
-<!--oooooooooo FINE MODULO: RICHIESTA SPEDIZIONE oooooooooo-->
+<!--oooooooooo Fin Modulo: RICHIESTA SPEDIZIONE oooooooooo-->
     
 
       
@@ -296,7 +296,7 @@
     </div>
   `;
 
- // oooooooooo FINE TEMPLATE CODIFICA ARTICOLO oooooooooo
+ // oooooooooo Fin TEMPLATE CODIFICA ARTICOLO oooooooooo
 
 
   
@@ -413,7 +413,7 @@ const templateAcqItem = (n) => `
   </div>
 `;
 
-// oooooooooo FINE TEMPLATE ARTICOLO ACQUISTO oooooooooo
+// oooooooooo Fin TEMPLATE ARTICOLO ACQUISTO oooooooooo
 
 
 
@@ -426,7 +426,7 @@ const EMAIL_KLODIAN  = "kfarruku@lindt.com";
 const EMAIL_FEDERICO = "fmarino@lindt.com";
 
   
-// XXXXXXXXXX FUNZIONI JS ACQUISTI XXXXXXXXXX
+// XXXXXXXXXX Funciones JS ACQUISTI XXXXXXXXXX
   
 function acqSetStatus(msg, ok=false){
   const el = document.getElementById('acq_status');
@@ -640,7 +640,7 @@ function acqReset(){
     });
   }
 
-  // oooooooooo FINE FUNZIONI JS ACQUISTI oooooooooo
+  // oooooooooo Final Funcion JS ACQUISTI oooooooooo
 
   function buildSummary(){
     const email = "mdellorto@lindt.com";
@@ -954,8 +954,31 @@ function spdReset(){
   spdSetStatus('Ripristinato.');
 }
   
+// --- Funcion para no dejar vacio el campo de Richiedente ---
+  
+function richiedenteObbligatorio() {
+  const campo = document.getElementById('richiedente');
+  const valore = campo?.value.trim() || '';
 
+  if (!valore) {
+    alert('Inserire Nome e Cognome nel campo "Richiedente" prima di inviare.');
+    campo?.focus();
 
+    if (campo) {
+      campo.style.borderColor = '#ef4444';
+      campo.style.boxShadow = '0 0 0 3px rgba(239,68,68,.25)';
+    }
+
+    return false;
+  }
+
+  if (campo) {
+    campo.style.borderColor = '';
+    campo.style.boxShadow = '';
+  }
+
+  return true;
+}
 
 
 
@@ -988,8 +1011,48 @@ function spdReset(){
   if (document.querySelectorAll('[data-acq-item]').length === 0) acqAddItem();
   if (document.querySelectorAll('[data-spd-item]').length === 0) spdAddItem();
 
+
+// --- Bloqueo de envio cuando Richiedente esta vacio (CODIFICA) ---
+document.getElementById('mailBtn')?.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  if (!richiedenteObbligatorio()) return;
+
+  buildSummary();
+  window.location.href = document.getElementById('mailBtn').href;
+});
+
+// --- Bloqueo de envio cuando Richiedente esta vacio (ACQUISTO) ---
+document.getElementById('acq_mailBtn')?.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  if (!richiedenteObbligatorio()) return;
+
+  acqBuildSummary();
+  window.location.href = document.getElementById('acq_mailBtn').href;
+});
+
+// --- Bloqueo de envio cuando Richiedente esta vacio (SPEDIZIONE) ---
+document.getElementById('spd_mailBtn')?.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  if (!richiedenteObbligatorio()) return;
+
+  spdBuildSummary();
+  window.location.href = document.getElementById('spd_mailBtn').href;
+});
+
+
+document.getElementById('richiedente')?.addEventListener('input', () => {
+  const campo = document.getElementById('richiedente');
+  if (campo) {
+    campo.style.borderColor = '';
+    campo.style.boxShadow = '';
+  }
+});
   
-  // --- LOGICA MOSTRA/NASCONDI MODULI ---
+  
+  // --- LOGICA Muestra/Esconde MODULOS ---
  function showModule(which){
   const home = document.getElementById('modHome');
   const cod  = document.getElementById('modCodifica');
