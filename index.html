@@ -730,11 +730,10 @@ function acqReset(){
     
    const subject = encodeURIComponent('Richiesta codifica articoli');
    const body = encodeURIComponent(text);
-   const to = encodeURIComponent(EMAIL_MICHAEL);
-   const cc = encodeURIComponent(EMAIL_FMARINO);
+   const to = EMAIL_MICHAEL;
+   const cc = EMAIL_FEDERICO;
 
-   $('mailBtn').href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
-
+   $('mailBtn').href = `mailto:${to}?cc=${encodeURIComponent(cc)}&subject=${subject}&body=${body}`;
     setStatus('Riepilogo generato. ✅', true);
     return text;
   }
