@@ -1,4 +1,4 @@
-<!-- ======== App Manutenzione 2.2.3 ======== -->
+<!-- ======== App Manutenzione 2.2.4 ======== -->
 
 <!doctype html>
 <html lang="it">
@@ -728,9 +728,12 @@ function acqReset(){
 
     // XXXXXXXXXX MAILTO link (subject + body) XXXXXXXXXX
     
-    const subject = encodeURIComponent('Richiesta codifica articoli');
-    const body = encodeURIComponent(text);
-    $('mailBtn').href = `mailto:mdellorto@lindt.com?subject=${subject}&body=${body}`;
+   const subject = encodeURIComponent('Richiesta codifica articoli');
+   const body = encodeURIComponent(text);
+   const to = encodeURIComponent(EMAIL_MICHAEL);
+   const cc = encodeURIComponent(EMAIL_FMARINO);
+
+   $('mailBtn').href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
 
     setStatus('Riepilogo generato. ✅', true);
     return text;
