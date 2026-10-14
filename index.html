@@ -1,4 +1,4 @@
-<!-- ======== App Manutenzione 2.2.6 ======== -->
+<!-- ======== App Manutenzione 2.2.7 ======== -->
 
 <!doctype html>
 <html lang="it">
@@ -83,9 +83,15 @@
       </div>
       
 
-      <div class="field">
-      <label for="richiedente">Richiedente (Nome e Cognome)</label>
-      <input id="richiedente" name="richiedente" type="text" placeholder="Es. Mario Rossi">
+      <div class="row">
+        <div class="field">
+          <label for="richiedente">Richiedente (Nome e Cognome)</label>
+          <input id="richiedente" name="richiedente" type="text" placeholder="Es. Mario Rossi">
+        </div>
+        <div class="field">
+          <label for="codiceTransazione">Codice transazione</label>
+          <input id="codiceTransazione" name="codiceTransazione" type="text" placeholder="Generato con Passo 1" readonly>
+        </div>
       </div>
 
 <div class="btnbar" style="margin-top:10px;">
@@ -460,6 +466,23 @@ const EMAIL_FABIO    = "fcastagna@lindt.com";
 const EMAIL_KLODIAN  = "kfarruku@lindt.com";
 const EMAIL_FEDERICO = "fmarino@lindt.com";
 
+// XXXXXXXXXX CODICE TRANSAZIONE CONDIVISO XXXXXXXXXX
+let codiceTransazioneCorrente = '';
+function generaCodiceTransazione(prefisso){
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const casuale = new Uint32Array(2);
+  crypto.getRandomValues(casuale);
+  const random = Array.from(casuale).map(numero => numero.toString(36).toUpperCase().padStart(7, '0')).join('');
+  codiceTransazioneCorrente = `${prefisso}-${timestamp}-${random}`;
+  const campoCodice = document.getElementById('codiceTransazione');
+  if (campoCodice) campoCodice.value = codiceTransazioneCorrente;
+  return codiceTransazioneCorrente;
+}
+function ottieniCodiceTransazione(prefisso, generaNuovo=true){
+  if (generaNuovo || !codiceTransazioneCorrente || !codiceTransazioneCorrente.startsWith(`${prefisso}-`)) return generaCodiceTransazione(prefisso);
+  return codiceTransazioneCorrente;
+}
+
   
 // XXXXXXXXXX Funciones JS ACQUISTI XXXXXXXXXX
   
@@ -547,14 +570,16 @@ function acqGetItems(){
   });
 }
   
-function acqBuildSummary(){
+function acqBuildSummary(generaNuovoCodice=true){
   const rich = (document.getElementById('richiedente')?.value || '').trim();
+  const codice = ottieniCodiceTransazione('ACQ', generaNuovoCodice);
   const items = acqGetItems();
 
   const lines = [];
   lines.push('RICHIESTA ACQUISTO');
   lines.push('--------------------------------');
   lines.push(`Richiedente: ${rich || '(non indicato)'}`);
+  lines.push(`Codice transazione: ${codice}`);
   lines.push(`Numero articoli: ${items.length}`);
   lines.push('');
 
@@ -679,15 +704,17 @@ function acqReset(){
 
   // oooooooooo Final Funcion JS ACQUISTI oooooooooo
 
-  function buildSummary(){
+  function buildSummary(generaNuovoCodice=true){
     const email = "mdellorto@lindt.com";
     const richiedente = $('richiedente')?.value.trim() || '';
+    const codice = ottieniCodiceTransazione('COD', generaNuovoCodice);
     const items = getItemsData();
 
     const lines = [];
     lines.push('Richiesta codifica articoli');
     lines.push('--------------------------------');
     if (richiedente) lines.push(`Richiedente: ${richiedente}`);
+    lines.push(`Codice transazione: ${codice}`);
     lines.push(`Numero articoli: ${items.length}`);
     lines.push('');
 
@@ -920,8 +947,9 @@ function spdGetItems(){
   });
 }
 
-function spdBuildSummary(){
+function spdBuildSummary(generaNuovoCodice=true){
   const rich = (document.getElementById('richiedente')?.value || '').trim();
+  const codice = ottieniCodiceTransazione('SPD', generaNuovoCodice);
 
   const trasporto = spdGetTrasporto();
   const destinatario = (document.getElementById('spd_destinatario')?.value || '').trim();
@@ -935,6 +963,7 @@ function spdBuildSummary(){
   lines.push('RICHIESTA SPEDIZIONE (DDT)');
   lines.push('--------------------------------');
   lines.push(`Richiedente: ${rich || '(non indicato)'}`);
+  lines.push(`Codice transazione: ${codice}`);
   lines.push(`Trasporto a cura di: ${trasporto || '(non indicato)'}`);
   lines.push(`Destinatario: ${destinatario || '(non indicato)'}`);
   if (colli) lines.push(`N° Colli: ${colli}`);
@@ -1062,7 +1091,7 @@ document.getElementById('mailBtn')?.addEventListener('click', (e) => {
 
   if (!richiedenteObbligatorio()) return;
 
-  buildSummary();
+  buildSummary(false);
   window.location.href = document.getElementById('mailBtn').href;
 });
 
@@ -1072,7 +1101,7 @@ document.getElementById('acq_mailBtn')?.addEventListener('click', (e) => {
 
   if (!richiedenteObbligatorio()) return;
 
-  acqBuildSummary();
+  acqBuildSummary(false);
   window.location.href = document.getElementById('acq_mailBtn').href;
 });
 
@@ -1082,7 +1111,7 @@ document.getElementById('spd_mailBtn')?.addEventListener('click', (e) => {
 
   if (!richiedenteObbligatorio()) return;
 
-  spdBuildSummary();
+  spdBuildSummary(false);
   window.location.href = document.getElementById('spd_mailBtn').href;
 });
 
