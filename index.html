@@ -1,4 +1,4 @@
-<!-- ======== App Manutenzione 2.2.7 ======== -->
+<!-- ======== App Manutenzione 2.2.8 ======== -->
 
 <!doctype html>
 <html lang="it">
@@ -468,20 +468,36 @@ const EMAIL_FEDERICO = "fmarino@lindt.com";
 
 // XXXXXXXXXX CODICE TRANSAZIONE CONDIVISO XXXXXXXXXX
 let codiceTransazioneCorrente = '';
+
 function generaCodiceTransazione(prefisso){
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const casuale = new Uint32Array(2);
-  crypto.getRandomValues(casuale);
-  const random = Array.from(casuale).map(numero => numero.toString(36).toUpperCase().padStart(7, '0')).join('');
-  codiceTransazioneCorrente = `${prefisso}-${timestamp}-${random}`;
+  const caratteri = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const valoriCasuali = new Uint32Array(6);
+  crypto.getRandomValues(valoriCasuali);
+
+  const random = Array.from(valoriCasuali)
+    .map(valore => caratteri[valore % caratteri.length])
+    .join('');
+
+  codiceTransazioneCorrente = `${prefisso}-${random}`;
+
   const campoCodice = document.getElementById('codiceTransazione');
   if (campoCodice) campoCodice.value = codiceTransazioneCorrente;
+
   return codiceTransazioneCorrente;
 }
+
 function ottieniCodiceTransazione(prefisso, generaNuovo=true){
-  if (generaNuovo || !codiceTransazioneCorrente || !codiceTransazioneCorrente.startsWith(`${prefisso}-`)) return generaCodiceTransazione(prefisso);
+  if (
+    generaNuovo ||
+    !codiceTransazioneCorrente ||
+    !codiceTransazioneCorrente.startsWith(`${prefisso}-`)
+  ) {
+    return generaCodiceTransazione(prefisso);
+  }
+
   return codiceTransazioneCorrente;
 }
+
 
   
 // XXXXXXXXXX Funciones JS ACQUISTI XXXXXXXXXX
@@ -620,7 +636,7 @@ function acqBuildSummary(generaNuovoCodice=true){
 
   document.getElementById('acq_output').textContent = text;
 
-  const subject = encodeURIComponent('Richiesta acquisto');
+  const subject = encodeURIComponent(`Richiesta acquisto - ${codice}`);
   const body = encodeURIComponent(text);
 
   const to = [EMAIL_FABIO, EMAIL_KLODIAN].join(';');
@@ -753,7 +769,7 @@ function acqReset(){
 
     // XXXXXXXXXX MAILTO link (subject + body) XXXXXXXXXX
     
-   const subject = encodeURIComponent('Richiesta codifica articoli');
+   const subject = encodeURIComponent(`Richiesta codifica articoli - ${codice}`);
    const body = encodeURIComponent(text);
    const to = EMAIL_MICHAEL;
    const cc = EMAIL_FEDERICO;
@@ -987,7 +1003,7 @@ function spdBuildSummary(generaNuovoCodice=true){
 
   document.getElementById('spd_output').textContent = text;
 
-  const subject = encodeURIComponent('Richiesta spedizione (DDT)');
+  const subject = encodeURIComponent(`Richiesta spedizione (DDT) - ${codice}`);
   const body = encodeURIComponent(text);
   const to = encodeURIComponent(EMAIL_SPED_TO);
   const cc = encodeURIComponent(EMAIL_SPED_CC);
